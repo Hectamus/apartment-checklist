@@ -626,6 +626,10 @@ function render(){
   h += '</div>';
 
   var app = document.getElementById("app");
+  if(!app){
+    console.error("App container not found");
+    return;
+  }
   app.innerHTML = h;
 
   // autofocus add-name field
@@ -970,15 +974,26 @@ function handleKeydown(e){
   }
 }
 
-/* ─────────── Init ─────────── */
-loadPrefs();       // per-device view preferences (sort)
-load();            // instant UI from local cache
-render();          // render immediately before Firebase even loads
-initFirebase();    // connect to shared sync; re-renders when cloud data arrives
-var app = document.getElementById("app");
-app.addEventListener("click", handleClick);
-app.addEventListener("input", handleInput);
-app.addEventListener("keydown", handleKeydown);
+/* ─────────── Init (wait for DOM) ─────────── */
+function initApp(){
+  loadPrefs();       // per-device view preferences (sort)
+  load();            // instant UI from local cache
+  render();          // render immediately before Firebase even loads
+  initFirebase();    // connect to shared sync; re-renders when cloud data arrives
+  var app = document.getElementById("app");
+  if(app){
+    app.addEventListener("click", handleClick);
+    app.addEventListener("input", handleInput);
+    app.addEventListener("keydown", handleKeydown);
+  }
+}
+
+// Wait for DOM to be ready
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
 </script>
 </body>
 </html>
