@@ -39,11 +39,11 @@
   .filters{background:#EDE8DF;border-bottom:1px solid #D6CFC5;padding:12px 16px;}
   .srow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;}
   .srow::-webkit-scrollbar{display:none;}
-  .cbtn{cursor:pointer;border:none;background:#EDE8DF;color:var(--muted);padding:8px 14px;border-radius:20px;font-family:var(--sans);font-size:13px;font-weight:500;white-space:nowrap;transition:all .15s;}
+  .cbtn{cursor:pointer;border:none;background:#EDE8DF;color:var(--muted);padding:8px 14px;border-radius:20px;font-family:var(--sans);font-size:13px;font-weight:500;white-space:nowrap;transition:all .1s;}
   .cbtn:hover{background:#E2D9CE;color:#44403C;}
   .cbtn.on{background:var(--accent);color:#fff;}
   .prow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-  .pbtn{cursor:pointer;border:1.5px solid #D6CFC5;background:transparent;color:var(--muted);padding:6px 14px;border-radius:20px;font-family:var(--sans);font-size:12px;font-weight:500;transition:all .15s;}
+  .pbtn{cursor:pointer;border:1.5px solid #D6CFC5;background:transparent;color:var(--muted);padding:6px 14px;border-radius:20px;font-family:var(--sans);font-size:12px;font-weight:500;transition:all .1s;}
 
   .list{max-width:680px;margin:0 auto;padding:16px;}
   .cat{margin-bottom:24px;}
@@ -99,7 +99,7 @@
   .dbtn{cursor:pointer;background:none;border:1.5px solid #FECACA;border-radius:8px;padding:6px 14px;font-family:var(--sans);font-size:12px;font-weight:500;color:#991B1B;transition:all .15s;}
   .dbtn:hover{background:#FEE2E2;}
   .dbtn.confirm{background:#FEE2E2;font-weight:600;}
-  .addbtn{cursor:pointer;border:1.5px dashed #D6CFC5;background:none;border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:13px;color:#A8A29E;width:100%;text-align:left;transition:all .15s;display:flex;align-items:center;gap:6px;}
+  .addbtn{cursor:pointer;border:1.5px dashed #D6CFC5;background:none;border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:13px;color:#A8A29E;width:100%;text-align:left;transition:all .15s;}
   .addbtn:hover{border-color:var(--accent);color:var(--accent);background:#FFF8F6;}
   .addform{background:#fff;border-radius:12px;border:1.5px solid var(--accent);padding:14px;animation:slideDown .15s ease;}
   .restorebtn{cursor:pointer;background:none;border:1.5px solid #D6CFC5;border-radius:8px;padding:5px 12px;font-family:var(--sans);font-size:12px;font-weight:600;color:#44403C;white-space:nowrap;transition:all .15s;}
@@ -112,8 +112,8 @@
 <div id="app"></div>
 
 <!-- Firebase (Realtime Database) for shared live sync -->
-<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js" async></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-database-compat.js" async></script>
 
 <script>
 "use strict";
@@ -270,7 +270,7 @@ var BASE = [
 ];
 
 var CATS = ["Bedroom","Living Room","Dining","Kitchen","Pantry","Bathroom","Misc","Cleaning"];
-var CAT_ICONS = {"Bedroom":"\uD83D\uDECF\uFE0F","Living Room":"\uD83D\uDECB\uFE0F","Dining":"\uD83C\uDF7D\uFE0F","Kitchen":"\uD83C\uDF73","Pantry":"\uD83E\uDED9","Bathroom":"\uD83D\uDEBF","Misc":"\uD83E\uDDF0","Cleaning":"\uD83E\uDDF9"};
+var CAT_ICONS = {"Bedroom":"🛏️","Living Room":"🛋️","Dining":"🍽️","Kitchen":"🍳","Pantry":"🥙","Bathroom":"🚿","Misc":"📦","Cleaning":"🧹"};
 var PRIORITIES = ["Day 1","Week 1","Anytime"];
 var PRI_STYLE = {
   "Day 1":{bg:"#FEE2E2",text:"#991B1B",border:"#FECACA"},
@@ -279,9 +279,13 @@ var PRI_STYLE = {
 };
 var KEY = "fremont-checklist-v1";
 
+// Calculate total budget (sum of all high estimates)
+var totalLo = 0, totalHi = 0;
+BASE.forEach(function(i){ totalLo += Number(i.lo)||0; totalHi += Number(i.hi)||0; });
+
 // All categories = built-in + any custom ones the user added
 function allCats(){ return CATS.concat(state.customCats || []); }
-function catIcon(c){ return CAT_ICONS[c] || "\uD83D\uDCE6"; } // default: box emoji
+function catIcon(c){ return CAT_ICONS[c] || "📦"; } // default: box emoji
 function catDisplay(c){ return (state.catNames && state.catNames[c]) ? state.catNames[c] : c; }
 
 // view preferences (per-device, not synced)
@@ -374,6 +378,7 @@ function initFirebase(){
       if(state.editId===null && state.addingTo===null){ render(); }
     }, function(){ state.syncStatus="offline"; updateSyncBadge(); });
   }catch(e){
+    console.error("Firebase init error:", e);
     state.syncStatus="offline"; updateSyncBadge();
   }
 }
@@ -382,13 +387,13 @@ function pushToFirebase(){
   if(!dbRef) return;
   var payload = {checked:state.checked, edits:state.edits, custom:state.custom, customCats:state.customCats, catNames:state.catNames};
   lastPushed = JSON.stringify(payload);
-  try{ dbRef.set(payload); }catch(e){}
+  try{ dbRef.set(payload); }catch(e){ console.error("Firebase push error:", e); }
 }
 
 function syncBadgeHTML(){
-  if(state.syncStatus==="synced")  return "\u2713 Live sync on \u2014 edits from both of you show up here automatically";
-  if(state.syncStatus==="offline") return "Offline \u2014 saved on this device, will sync when reconnected";
-  return "Connecting to live sync\u2026";
+  if(state.syncStatus==="synced")  return "✓ Live sync on — edits from both of you show up here automatically";
+  if(state.syncStatus==="offline") return "Offline — saved on this device, will sync when reconnected";
+  return "Connecting to live sync…";
 }
 function updateSyncBadge(){
   var el = document.getElementById("syncbadge");
@@ -548,9 +553,9 @@ function render(){
       h += '<span class="icon">'+catIcon(cat)+'</span>';
       h += '<h2>'+esc(catDisplay(cat))+'</h2>';
       h += '<span class="count">'+catDone+'/'+items.length+'</span>';
-      h += '<button class="catedit" data-act="renamecat" data-cat="'+esc(cat)+'" title="Rename category">\u270E</button>';
+      h += '<button class="catedit" data-act="renamecat" data-cat="'+esc(cat)+'" title="Rename category">✏️</button>';
       if(isCustomCat){
-        h += '<button class="catdel" data-act="delcat" data-cat="'+esc(cat)+'" title="Remove category">\u2715</button>';
+        h += '<button class="catdel" data-act="delcat" data-cat="'+esc(cat)+'" title="Remove category">✕</button>';
       }
       h += '<span class="chev'+(collapsed?' closed':'')+'">\u25BC</span>';
       h += '</div>';
@@ -587,7 +592,7 @@ function render(){
   if(hiddenCt>0){
     h += '<div class="cat hidsec">';
     h += '<div class="cathead" data-act="togglehidden">';
-    h += '<span class="icon">\uD83D\uDE48</span>';
+    h += '<span class="icon">🙈</span>';
     h += '<h2>Hidden items</h2>';
     h += '<span class="count">'+hiddenCt+' item'+(hiddenCt!==1?'s':'')+'</span>';
     h += '<span class="chev'+(state.showHiddenSec?'':' closed')+'">\u25BC</span>';
@@ -660,17 +665,17 @@ function itemCard(item){
   c += '<div class="meta">';
   c += '<span class="pill" style="background:'+ps.bg+';color:'+ps.text+';border:1px solid '+ps.border+';">'+esc(pri)+'</span>';
   if(Number(lo)||Number(hi)){ c += '<span class="cost">'+fmt(lo)+'&ndash;'+fmt(hi)+'</span>'; }
-  if(where && where!=="-"){ c += '<span class="where">\uD83D\uDED2 '+esc(where)+'</span>'; }
+  if(where && where!=="-"){ c += '<span class="where">🛒 '+esc(where)+'</span>'; }
   var who = dispAssignee(item);
-  if(who){ c += '<span class="assignee">\uD83D\uDC64 '+esc(who)+'</span>'; }
+  if(who){ c += '<span class="assignee">👤 '+esc(who)+'</span>'; }
   c += '</div>';
   if(!open && note){ c += '<p class="note">"'+esc(note)+'"</p>'; }
   if(!open && link){
-    var shortL = link.length>42 ? link.slice(0,42)+"\u2026" : link;
-    c += '<a class="linkchip" href="'+esc(link)+'" target="_blank" rel="noreferrer" data-stop="1">\uD83D\uDD17 '+esc(shortL)+'</a>';
+    var shortL = link.length>42 ? link.slice(0,42)+"…" : link;
+    c += '<a class="linkchip" href="'+esc(link)+'" target="_blank" rel="noreferrer" data-stop="1">🔗 '+esc(shortL)+'</a>';
   }
   c += '</div>';
-  c += '<button class="eico'+(open?' on':'')+'" data-act="'+(open?'canceledit':'openedit')+'" data-id="'+esc(item.id)+'">\u270E</button>';
+  c += '<button class="eico'+(open?' on':'')+'" data-act="'+(open?'canceledit':'openedit')+'" data-id="'+esc(item.id)+'">✏️</button>';
   c += '</div>';
 
   /* edit panel */
@@ -713,7 +718,7 @@ function itemCard(item){
       c += '<button class="dbtn confirm" data-act="confirmdel" data-id="'+esc(item.id)+'">'+(custom?'Yes, delete':'Yes, hide')+'</button> ';
       c += '<button class="xbtn" style="font-size:12px;" data-act="canceldel">No</button>';
     } else {
-      c += '<button class="dbtn" data-act="askdel" data-id="'+esc(item.id)+'">'+(custom?'\uD83D\uDDD1 Delete':'\uD83D\uDE48 Hide')+'</button>';
+      c += '<button class="dbtn" data-act="askdel" data-id="'+esc(item.id)+'">'+(custom?'🗑️ Delete':'🙈 Hide')+'</button>';
     }
     c += '</div>';
     c += '<div style="display:flex;gap:8px;">';
@@ -968,7 +973,7 @@ function handleKeydown(e){
 /* ─────────── Init ─────────── */
 loadPrefs();       // per-device view preferences (sort)
 load();            // instant UI from local cache
-render();
+render();          // render immediately before Firebase even loads
 initFirebase();    // connect to shared sync; re-renders when cloud data arrives
 var app = document.getElementById("app");
 app.addEventListener("click", handleClick);
