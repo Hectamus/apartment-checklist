@@ -302,7 +302,7 @@ var state = {
   editId:null, draftEdits:null, addingTo:null,
   draft:{name:"",pri:"Week 1",where:"",cost:""},
   confirmId:null, catFilter:"All", priFilter:"All", showHiddenSec:false,
-  syncStatus:"connecting",
+  syncStatus:"connecting", lastEdited:null,
   addingCat:false, newCatName:"",
   renamingCat:null, catRenameDraft:"",
   sortMode:"default", confirmClear:false
@@ -319,12 +319,13 @@ function load(){
       state.custom = d.custom||[];
       state.customCats = d.customCats||[];
       state.catNames = d.catNames||{};
+      state.lastEdited = d.lastEdited||null;
     }
   }catch(e){}
 }
 function saveLocal(){
   try{
-    localStorage.setItem(KEY, JSON.stringify({checked:state.checked, edits:state.edits, custom:state.custom, customCats:state.customCats, catNames:state.catNames}));
+    localStorage.setItem(KEY, JSON.stringify({checked:state.checked, edits:state.edits, custom:state.custom, customCats:state.customCats, catNames:state.catNames, lastEdited:state.lastEdited}));
   }catch(e){}
 }
 
@@ -376,13 +377,14 @@ function initFirebase(){
         }
         return;
       }
-      var incoming = JSON.stringify({checked:v.checked||{}, edits:v.edits||{}, custom:v.custom||[], customCats:v.customCats||[], catNames:v.catNames||{}});
+      var incoming = JSON.stringify({checked:v.checked||{}, edits:v.edits||{}, custom:v.custom||[], customCats:v.customCats||[], catNames:v.catNames||{}, lastEdited:v.lastEdited||null});
       if(incoming === lastPushed) return; // ignore the echo of our own write
       state.checked = v.checked||{};
       state.edits   = v.edits||{};
       state.custom  = v.custom||[];
       state.customCats = v.customCats||[];
       state.catNames = v.catNames||{};
+      state.lastEdited = v.lastEdited||null;
       try{ localStorage.setItem(KEY, incoming); }catch(e){}
       // don't yank the UI out from under someone mid-edit
       if(state.editId===null && state.addingTo===null){ render(); }
@@ -395,15 +397,27 @@ function initFirebase(){
 
 function pushToFirebase(){
   if(!dbRef) return;
-  var payload = {checked:state.checked, edits:state.edits, custom:state.custom, customCats:state.customCats, catNames:state.catNames};
+  var payload = {checked:state.checked, edits:state.edits, custom:state.custom, customCats:state.customCats, catNames:state.catNames, lastEdited:state.lastEdited};
   lastPushed = JSON.stringify(payload);
   try{ dbRef.set(payload); }catch(e){ console.error("Firebase push error:", e); }
 }
 
+function fmtEdited(ts){
+  if(!ts) return "";
+  var d = new Date(ts), now = new Date();
+  var time = d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  if(d.toDateString()===now.toDateString()) return "Last edited today at "+time;
+  var y = new Date(now); y.setDate(now.getDate()-1);
+  if(d.toDateString()===y.toDateString()) return "Last edited yesterday at "+time;
+  return "Last edited "+d.toLocaleDateString([], {month:"short", day:"numeric"})+" at "+time;
+}
 function syncBadgeHTML(){
-  if(state.syncStatus==="synced")  return "✓ Live sync on — edits from both of you show up here automatically";
-  if(state.syncStatus==="offline") return "Offline — saved on this device, will sync when reconnected";
-  return "Connecting to live sync…";
+  var status;
+  if(state.syncStatus==="synced")  status = "\u2713 Live sync on \u2014 edits from both of you show up here automatically";
+  else if(state.syncStatus==="offline") status = "Offline \u2014 saved on this device, will sync when reconnected";
+  else status = "Connecting to live sync\u2026";
+  var le = fmtEdited(state.lastEdited);
+  return status + (le ? '<br><span style="opacity:.75;">'+le+'</span>' : '');
 }
 function updateSyncBadge(){
   var el = document.getElementById("syncbadge");
@@ -412,6 +426,7 @@ function updateSyncBadge(){
 
 /* persist = save locally AND push to the shared cloud */
 function persist(){
+  state.lastEdited = Date.now();
   saveLocal();
   pushToFirebase();
 }
@@ -484,7 +499,6 @@ function render(){
 
   /* Header */
   h += '<div class="header"><div class="wrap">';
-  h += '<p class="eyebrow">Fremont Move-In</p>';
   h += '<h1 class="title">Apartment Checklist</h1>';
   h += '<div class="progress-row"><span class="left">'+doneCount+' of '+visible.length+' items</span>';
   h += '<span class="pct'+(pct===100?' done':'')+'">'+pct+'%</span></div>';
