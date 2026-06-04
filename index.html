@@ -104,6 +104,10 @@
 <body>
 <div id="app"></div>
 
+<!-- Firebase (Realtime Database) for shared live sync -->
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-database-compat.js"></script>
+
 <script>
 "use strict";
 
@@ -273,10 +277,11 @@ var state = {
   checked:{}, edits:{}, custom:[], collapsed:{},
   editId:null, draftEdits:null, addingTo:null,
   draft:{name:"",pri:"Week 1",where:"",lo:"",hi:""},
-  confirmId:null, catFilter:"All", priFilter:"All", showHiddenSec:false
+  confirmId:null, catFilter:"All", priFilter:"All", showHiddenSec:false,
+  syncStatus:"connecting"
 };
 
-/* ─────────── Storage (localStorage) ─────────── */
+/* ─────────── Storage (localStorage cache) ─────────── */
 function load(){
   try{
     var raw = localStorage.getItem(KEY);
@@ -288,10 +293,84 @@ function load(){
     }
   }catch(e){}
 }
-function persist(){
+function saveLocal(){
   try{
     localStorage.setItem(KEY, JSON.stringify({checked:state.checked, edits:state.edits, custom:state.custom}));
   }catch(e){}
+}
+
+/* ─────────── Firebase (shared live sync) ─────────── */
+var FB_CONFIG = {
+  apiKey: "AIzaSyD8Kx_ghZdFF81tt_Iq4fP1UU7Fu7_mR_E",
+  authDomain: "apartment-checklist-9427b.firebaseapp.com",
+  databaseURL: "https://apartment-checklist-9427b-default-rtdb.firebaseio.com",
+  projectId: "apartment-checklist-9427b",
+  storageBucket: "apartment-checklist-9427b.firebasestorage.app",
+  messagingSenderId: "537916581347",
+  appId: "1:537916581347:web:656e1c1ff1dc0c1640ecd6"
+};
+
+var dbRef = null;
+var lastPushed = "";
+
+function initFirebase(){
+  if(typeof firebase === "undefined"){ state.syncStatus="offline"; updateSyncBadge(); return; }
+  try{
+    firebase.initializeApp(FB_CONFIG);
+    var db = firebase.database();
+    dbRef = db.ref("checklist");
+
+    // connection indicator
+    db.ref(".info/connected").on("value", function(snap){
+      state.syncStatus = (snap.val()===true) ? "synced" : "offline";
+      updateSyncBadge();
+    });
+
+    // live shared data
+    dbRef.on("value", function(snap){
+      var v = snap.val();
+      if(v===null){
+        // nothing in the cloud yet — seed it from whatever is local
+        if(Object.keys(state.checked).length || Object.keys(state.edits).length || state.custom.length){
+          pushToFirebase();
+        }
+        return;
+      }
+      var incoming = JSON.stringify({checked:v.checked||{}, edits:v.edits||{}, custom:v.custom||[]});
+      if(incoming === lastPushed) return; // ignore the echo of our own write
+      state.checked = v.checked||{};
+      state.edits   = v.edits||{};
+      state.custom  = v.custom||[];
+      try{ localStorage.setItem(KEY, incoming); }catch(e){}
+      // don't yank the UI out from under someone mid-edit
+      if(state.editId===null && state.addingTo===null){ render(); }
+    }, function(){ state.syncStatus="offline"; updateSyncBadge(); });
+  }catch(e){
+    state.syncStatus="offline"; updateSyncBadge();
+  }
+}
+
+function pushToFirebase(){
+  if(!dbRef) return;
+  var payload = {checked:state.checked, edits:state.edits, custom:state.custom};
+  lastPushed = JSON.stringify(payload);
+  try{ dbRef.set(payload); }catch(e){}
+}
+
+function syncBadgeHTML(){
+  if(state.syncStatus==="synced")  return "\u2713 Live sync on \u2014 edits from both of you show up here automatically";
+  if(state.syncStatus==="offline") return "Offline \u2014 saved on this device, will sync when reconnected";
+  return "Connecting to live sync\u2026";
+}
+function updateSyncBadge(){
+  var el = document.getElementById("syncbadge");
+  if(el) el.innerHTML = syncBadgeHTML();
+}
+
+/* persist = save locally AND push to the shared cloud */
+function persist(){
+  saveLocal();
+  pushToFirebase();
 }
 
 /* ─────────── Helpers ─────────── */
@@ -343,7 +422,7 @@ function render(){
   h += '<div class="progress-row"><span class="left">'+doneCount+' of '+visible.length+' items</span>';
   h += '<span class="pct'+(pct===100?' done':'')+'">'+pct+'%</span></div>';
   h += '<div class="bar"><div style="width:'+pct+'%"></div></div>';
-  h += '<div class="info">Saved automatically to this browser. Hit the same link on this device to pick up where you left off.</div>';
+  h += '<div class="info" id="syncbadge">'+syncBadgeHTML()+'</div>';
   h += '<div class="cards">';
   h += '<div class="stat"><div class="k">Remaining budget (shown)</div><div class="v">'+fmt(budgetLo)+' &ndash; '+fmt(budgetHi)+'</div></div>';
   h += '<div class="stat"><div class="k">Still need to buy</div><div class="v green">'+stillNeed+' items</div></div>';
@@ -688,8 +767,9 @@ function handleKeydown(e){
 }
 
 /* ─────────── Init ─────────── */
-load();
+load();            // instant UI from local cache
 render();
+initFirebase();    // connect to shared sync; re-renders when cloud data arrives
 var app = document.getElementById("app");
 app.addEventListener("click", handleClick);
 app.addEventListener("input", handleInput);
