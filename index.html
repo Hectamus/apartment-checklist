@@ -49,7 +49,6 @@
   .cat{margin-bottom:24px;}
   .cathead{display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;user-select:none;}
   .cathead:hover h2{color:var(--accent);}
-  .cathead .icon{font-size:18px;}
   .cathead h2{font-size:17px;font-weight:600;transition:color .15s;}
   .cathead .count{font-size:12px;color:#A8A29E;}
   .chev{font-size:11px;color:#A8A29E;transition:transform .2s;margin-left:auto;}
@@ -120,157 +119,157 @@
 
 /* ─────────── Data ─────────── */
 var BASE = [
-  {id:1,cat:"Bedroom",name:"Mattress (Purple)",pri:"Day 1",lo:1200,hi:1500,where:"Purple.com / Mattress Firm"},
-  {id:2,cat:"Bedroom",name:"Bed frame with headboard",pri:"Day 1",lo:300,hi:600,where:"IKEA / Article / Wayfair"},
-  {id:3,cat:"Bedroom",name:"Nightstand(s)",pri:"Week 1",lo:80,hi:200,where:"IKEA / Target / Wayfair"},
-  {id:4,cat:"Bedroom",name:"Vanity",pri:"Week 1",lo:150,hi:300,where:"IKEA / Wayfair"},
-  {id:4.5,cat:"Bedroom",name:"Desk",pri:"Week 1",lo:100,hi:250,where:"IKEA / Amazon"},
-  {id:5,cat:"Bedroom",name:"Curtains",pri:"Week 1",lo:40,hi:80,where:"IKEA / Target"},
-  {id:6,cat:"Bedroom",name:"Bedding set",pri:"Day 1",lo:80,hi:200,where:"Target / Amazon / HomeGoods"},
-  {id:7,cat:"Bedroom",name:"Pillows",pri:"Day 1",lo:40,hi:100,where:"Target / Amazon"},
-  {id:8,cat:"Bedroom",name:"Decorative pillows",pri:"Anytime",lo:30,hi:60,where:"HomeGoods / Target"},
-  {id:9,cat:"Bedroom",name:"Fan",pri:"Week 1",lo:30,hi:80,where:"Target / Amazon"},
-  {id:10,cat:"Bedroom",name:"Small trash can",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:11,cat:"Bedroom",name:"Laundry baskets",pri:"Day 1",lo:20,hi:40,where:"Target / Amazon"},
-  {id:12,cat:"Living Room",name:"Couch",pri:"Week 1",lo:400,hi:900,where:"IKEA / Wayfair / Article"},
-  {id:13,cat:"Living Room",name:"Coffee table",pri:"Week 1",lo:100,hi:300,where:"IKEA / Wayfair"},
-  {id:14,cat:"Living Room",name:"Decorative pillows",pri:"Anytime",lo:30,hi:60,where:"HomeGoods / Target"},
-  {id:15,cat:"Living Room",name:"Blankets",pri:"Week 1",lo:30,hi:80,where:"Target / Amazon"},
-  {id:16,cat:"Living Room",name:"Curtains",pri:"Week 1",lo:30,hi:80,where:"IKEA / Target"},
-  {id:17,cat:"Living Room",name:"TV console",pri:"Week 1",lo:150,hi:400,where:"IKEA / Wayfair"},
-  {id:18,cat:"Living Room",name:"TV",pri:"Week 1",lo:300,hi:600,where:"Best Buy / Costco / Amazon"},
-  {id:19,cat:"Living Room",name:"Lamp",pri:"Week 1",lo:30,hi:80,where:"Target / IKEA"},
-  {id:20,cat:"Living Room",name:"Coasters",pri:"Anytime",lo:10,hi:20,where:"Target / Amazon"},
-  {id:21,cat:"Living Room",name:"Key bowl",pri:"Anytime",lo:10,hi:30,where:"HomeGoods / Amazon"},
-  {id:21.5,cat:"Living Room",name:"Area rug",pri:"Week 1",lo:80,hi:250,where:"HomeGoods / Wayfair / IKEA"},
-  {id:21.6,cat:"Living Room",name:"End table(s)",pri:"Week 1",lo:50,hi:150,where:"IKEA / Wayfair / Target"},
-  {id:22,cat:"Dining",name:"Dining table",pri:"Week 1",lo:200,hi:500,where:"IKEA / Wayfair"},
-  {id:23,cat:"Dining",name:"Dining chairs (set of 2-4)",pri:"Week 1",lo:100,hi:300,where:"IKEA / Wayfair"},
-  {id:23.5,cat:"Dining",name:"Napkins",pri:"Week 1",lo:10,hi:20,where:"Target / HomeGoods"},
-  {id:23.6,cat:"Dining",name:"Table runner",pri:"Anytime",lo:15,hi:35,where:"HomeGoods / Target"},
-  {id:26,cat:"Dining",name:"Silverware set",pri:"Day 1",lo:25,hi:50,where:"IKEA / Target"},
-  {id:27,cat:"Dining",name:"Straws",pri:"Anytime",lo:5,hi:15,where:"Amazon / Target"},
-  {id:33,cat:"Dining",name:"Serving spoons/forks",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:48,cat:"Dining",name:"Salt & pepper shakers",pri:"Week 1",lo:10,hi:20,where:"Target / HomeGoods"},
-  {id:50,cat:"Dining",name:"Fruit bowl",pri:"Anytime",lo:15,hi:30,where:"HomeGoods / Target"},
-  {id:51,cat:"Dining",name:"Serving bowls",pri:"Week 1",lo:20,hi:50,where:"Target / Amazon"},
-  {id:53,cat:"Dining",name:"Plates set",pri:"Day 1",lo:25,hi:50,where:"IKEA / Target"},
-  {id:54,cat:"Dining",name:"Bowls set",pri:"Day 1",lo:20,hi:40,where:"IKEA / Target"},
-  {id:55,cat:"Dining",name:"Cups / glasses",pri:"Day 1",lo:15,hi:35,where:"IKEA / Target"},
-  {id:56,cat:"Dining",name:"Mugs",pri:"Week 1",lo:15,hi:30,where:"Target / HomeGoods"},
-  {id:61,cat:"Dining",name:"Placemats",pri:"Anytime",lo:15,hi:30,where:"Target / HomeGoods"},
-  {id:24,cat:"Kitchen",name:"Pot set (1L, 1M, 2S)",pri:"Day 1",lo:60,hi:120,where:"Amazon / Target / TJ Maxx"},
-  {id:25,cat:"Kitchen",name:"Pan set (1L, 1M, 1S)",pri:"Day 1",lo:50,hi:100,where:"Amazon / Target / TJ Maxx"},
-  {id:28,cat:"Kitchen",name:"Spatula",pri:"Day 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:29,cat:"Kitchen",name:"Whisk",pri:"Week 1",lo:8,hi:12,where:"Target / Amazon"},
-  {id:30,cat:"Kitchen",name:"Ladle",pri:"Week 1",lo:8,hi:12,where:"Target / Amazon"},
-  {id:31,cat:"Kitchen",name:"Tongs",pri:"Day 1",lo:10,hi:15,where:"Target / Amazon"},
-  {id:32,cat:"Kitchen",name:"Wooden spoons",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:34,cat:"Kitchen",name:"Knife set",pri:"Day 1",lo:40,hi:100,where:"Amazon / TJ Maxx"},
-  {id:34.5,cat:"Kitchen",name:"Oven mitts / pot holders",pri:"Day 1",lo:10,hi:25,where:"Target / Amazon"},
-  {id:35,cat:"Kitchen",name:"Kitchen scissors",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:36,cat:"Kitchen",name:"Strainers",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
-  {id:37,cat:"Kitchen",name:"Measuring cups (dry)",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:38,cat:"Kitchen",name:"Measuring cups (wet)",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:39,cat:"Kitchen",name:"Measuring spoons",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:40,cat:"Kitchen",name:"Cheese grater",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:41,cat:"Kitchen",name:"Vegetable peeler",pri:"Week 1",lo:5,hi:10,where:"Target / Amazon"},
-  {id:42,cat:"Kitchen",name:"Garlic press",pri:"Anytime",lo:10,hi:15,where:"Target / Amazon"},
-  {id:43,cat:"Kitchen",name:"Blender",pri:"Week 1",lo:40,hi:80,where:"Amazon / Target"},
-  {id:44,cat:"Kitchen",name:"Air fryer / toaster oven",pri:"Week 1",lo:60,hi:150,where:"Amazon / Target / Costco"},
-  {id:45,cat:"Kitchen",name:"Wine opener",pri:"Anytime",lo:10,hi:25,where:"Target / Amazon"},
-  {id:46,cat:"Kitchen",name:"Teapot",pri:"Anytime",lo:20,hi:50,where:"Amazon / HomeGoods"},
-  {id:47,cat:"Kitchen",name:"Kitchen towels",pri:"Day 1",lo:12,hi:25,where:"Target / IKEA"},
-  {id:49,cat:"Kitchen",name:"Towel holder",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
-  {id:52,cat:"Kitchen",name:"Pyrex / glass containers",pri:"Week 1",lo:25,hi:50,where:"Target / Amazon"},
-  {id:57,cat:"Kitchen",name:"Large trash can",pri:"Day 1",lo:25,hi:50,where:"Target / Amazon"},
-  {id:58,cat:"Kitchen",name:"Can opener",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:59,cat:"Kitchen",name:"Baking sheet",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
-  {id:60,cat:"Kitchen",name:"Food storage containers",pri:"Week 1",lo:25,hi:50,where:"Target / Amazon"},
-  {id:62,cat:"Kitchen",name:"Dish drying mat",pri:"Day 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:63,cat:"Kitchen",name:"Cutting boards (set)",pri:"Day 1",lo:20,hi:40,where:"Target / Amazon"},
-  {id:64,cat:"Kitchen",name:"Coffee maker",pri:"Week 1",lo:30,hi:80,where:"Amazon / Target"},
-  {id:65,cat:"Kitchen",name:"Paper towel holder",pri:"Week 1",lo:12,hi:25,where:"Target / Amazon"},
-  {id:200,cat:"Pantry",name:"Cooking oil",pri:"Day 1",lo:8,hi:15,where:"Grocery / Costco"},
-  {id:201,cat:"Pantry",name:"Salt",pri:"Day 1",lo:3,hi:6,where:"Grocery"},
-  {id:202,cat:"Pantry",name:"Pepper",pri:"Day 1",lo:3,hi:6,where:"Grocery"},
-  {id:203,cat:"Pantry",name:"Basic spices",pri:"Week 1",lo:15,hi:30,where:"Grocery / Costco"},
-  {id:204,cat:"Pantry",name:"Sugar",pri:"Week 1",lo:3,hi:6,where:"Grocery"},
-  {id:205,cat:"Pantry",name:"All-purpose flour",pri:"Week 1",lo:4,hi:8,where:"Grocery"},
-  {id:206,cat:"Pantry",name:"Soy sauce",pri:"Week 1",lo:3,hi:6,where:"Grocery"},
-  {id:207,cat:"Pantry",name:"Hot sauce",pri:"Week 1",lo:3,hi:6,where:"Grocery"},
-  {id:208,cat:"Pantry",name:"Olive oil / butter",pri:"Day 1",lo:8,hi:15,where:"Grocery / Costco"},
-  {id:209,cat:"Pantry",name:"Aluminum foil",pri:"Week 1",lo:4,hi:8,where:"Grocery / Target"},
-  {id:210,cat:"Pantry",name:"Plastic wrap / zip-lock bags",pri:"Week 1",lo:6,hi:12,where:"Grocery / Target"},
-  {id:66,cat:"Bathroom",name:"Bath mat",pri:"Day 1",lo:20,hi:40,where:"Target / HomeGoods"},
-  {id:67,cat:"Bathroom",name:"Shower curtain",pri:"Day 1",lo:20,hi:50,where:"Target / IKEA"},
-  {id:68,cat:"Bathroom",name:"Shower curtain liner",pri:"Day 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:69,cat:"Bathroom",name:"Shower curtain rings/hooks",pri:"Day 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:70,cat:"Bathroom",name:"Hand towels",pri:"Day 1",lo:15,hi:30,where:"Target / HomeGoods"},
-  {id:71,cat:"Bathroom",name:"Bath towels",pri:"Day 1",lo:25,hi:50,where:"Target / HomeGoods"},
-  {id:72,cat:"Bathroom",name:"Shower caddy",pri:"Day 1",lo:20,hi:40,where:"Amazon / Target"},
-  {id:73,cat:"Bathroom",name:"Towel hooks",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
-  {id:74,cat:"Bathroom",name:"Toilet wand / brush",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:75,cat:"Bathroom",name:"Plunger",pri:"Day 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:76,cat:"Bathroom",name:"Soap dispenser",pri:"Week 1",lo:10,hi:20,where:"Target / HomeGoods"},
-  {id:77,cat:"Bathroom",name:"Small trash can",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:78,cat:"Bathroom",name:"Squatty Potty",pri:"Anytime",lo:25,hi:40,where:"Amazon / Target"},
-  {id:79,cat:"Bathroom",name:"Bidet",pri:"Anytime",lo:30,hi:80,where:"Amazon"},
-  {id:80,cat:"Bathroom",name:"Flushable wipes + holder",pri:"Week 1",lo:12,hi:20,where:"Target / Amazon"},
-  {id:81,cat:"Bathroom",name:"Hand soap",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
-  {id:82,cat:"Bathroom",name:"Toilet paper",pri:"Day 1",lo:12,hi:20,where:"Target / Costco / Grocery"},
-  {id:83,cat:"Bathroom",name:"Toilet paper holder",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
-  {id:83.5,cat:"Bathroom",name:"Toilet bowl cleaner",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
-  {id:84,cat:"Misc",name:"Wagon",pri:"Anytime",lo:50,hi:150,where:"Amazon / Target"},
-  {id:85,cat:"Misc",name:"First aid kit",pri:"Day 1",lo:20,hi:40,where:"Target / Amazon"},
-  {id:86,cat:"Misc",name:"Vacuum",pri:"Week 1",lo:80,hi:200,where:"Amazon / Target / Costco"},
-  {id:87,cat:"Misc",name:"Broom",pri:"Week 1",lo:20,hi:40,where:"Target / Amazon"},
-  {id:88,cat:"Misc",name:"Swiffer",pri:"Week 1",lo:30,hi:50,where:"Target / Amazon"},
-  {id:89,cat:"Misc",name:"Duster",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:91,cat:"Misc",name:"Basic tool kit",pri:"Day 1",lo:30,hi:60,where:"Home Depot / Amazon"},
-  {id:92,cat:"Misc",name:"Welcome mat",pri:"Week 1",lo:20,hi:40,where:"Target / Amazon"},
-  {id:93,cat:"Misc",name:"Shoe rack (closet)",pri:"Week 1",lo:20,hi:50,where:"Amazon / IKEA"},
-  {id:94,cat:"Misc",name:"Medicine kit",pri:"Week 1",lo:25,hi:50,where:"Target / CVS"},
-  {id:95,cat:"Misc",name:"Clothing hangers",pri:"Day 1",lo:15,hi:25,where:"Target / Amazon"},
-  {id:96,cat:"Misc",name:"Full length mirror",pri:"Week 1",lo:40,hi:100,where:"IKEA / Target"},
-  {id:97,cat:"Misc",name:"Organizers",pri:"Week 1",lo:25,hi:60,where:"Target / Amazon / IKEA"},
-  {id:98,cat:"Misc",name:"Lighter",pri:"Week 1",lo:5,hi:10,where:"Target / CVS"},
-  {id:99,cat:"Misc",name:"Lightbulbs",pri:"Day 1",lo:15,hi:30,where:"Target / Home Depot"},
-  {id:100,cat:"Misc",name:"Batteries",pri:"Week 1",lo:12,hi:20,where:"Target / Amazon"},
-  {id:101,cat:"Misc",name:"Command hooks",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
-  {id:102,cat:"Misc",name:"Level",pri:"Anytime",lo:10,hi:20,where:"Home Depot / Amazon"},
-  {id:103,cat:"Misc",name:"Flashlight",pri:"Week 1",lo:10,hi:25,where:"Target / Amazon"},
-  {id:104,cat:"Misc",name:"Extension cords",pri:"Day 1",lo:15,hi:30,where:"Target / Amazon"},
-  {id:105,cat:"Misc",name:"Power strips",pri:"Day 1",lo:20,hi:40,where:"Amazon / Target"},
-  {id:106,cat:"Misc",name:"Bug spray",pri:"Week 1",lo:8,hi:15,where:"Target / Grocery"},
-  {id:107,cat:"Misc",name:"Air purifier",pri:"Week 1",lo:80,hi:200,where:"Amazon / Target / Costco"},
-  {id:108,cat:"Misc",name:"Ring alarm",pri:"Anytime",lo:100,hi:200,where:"Amazon / Best Buy"},
-  {id:109,cat:"Misc",name:"Iron",pri:"Anytime",lo:30,hi:60,where:"Target / Amazon"},
-  {id:110,cat:"Misc",name:"Ironing board",pri:"Anytime",lo:25,hi:50,where:"Target / Amazon"},
-  {id:111,cat:"Cleaning",name:"Windex",pri:"Week 1",lo:4,hi:8,where:"Target / Grocery"},
-  {id:112,cat:"Cleaning",name:"Clorox wipes",pri:"Day 1",lo:8,hi:12,where:"Target / Grocery"},
-  {id:113,cat:"Cleaning",name:"Clorox spray",pri:"Week 1",lo:5,hi:8,where:"Target / Grocery"},
-  {id:114,cat:"Cleaning",name:"Fabuloso",pri:"Week 1",lo:6,hi:10,where:"Target / Grocery"},
-  {id:115,cat:"Cleaning",name:"Magic eraser",pri:"Week 1",lo:5,hi:8,where:"Target / Grocery"},
-  {id:116,cat:"Cleaning",name:"Laundry detergent",pri:"Day 1",lo:15,hi:25,where:"Target / Grocery / Costco"},
-  {id:117,cat:"Cleaning",name:"Dryer sheets",pri:"Day 1",lo:6,hi:12,where:"Target / Grocery"},
-  {id:118,cat:"Cleaning",name:"Dishwasher soap / pods",pri:"Week 1",lo:10,hi:18,where:"Target / Grocery"},
-  {id:119,cat:"Cleaning",name:"Sponges",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
-  {id:120,cat:"Cleaning",name:"Tissues",pri:"Week 1",lo:4,hi:8,where:"Target / Grocery"},
-  {id:121,cat:"Cleaning",name:"Trash bags",pri:"Day 1",lo:8,hi:15,where:"Target / Grocery / Costco"},
-  {id:122,cat:"Cleaning",name:"Toothpaste",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
-  {id:123,cat:"Cleaning",name:"Shampoo",pri:"Day 1",lo:8,hi:15,where:"Target / Grocery"},
-  {id:124,cat:"Cleaning",name:"Conditioner",pri:"Day 1",lo:8,hi:15,where:"Target / Grocery"},
-  {id:125,cat:"Cleaning",name:"Microfiber cloths",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
-  {id:126,cat:"Cleaning",name:"Draino",pri:"Week 1",lo:8,hi:12,where:"Target / Home Depot"},
-  {id:127,cat:"Cleaning",name:"Dish soap",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
-  {id:128,cat:"Cleaning",name:"Cleaning gloves",pri:"Week 1",lo:5,hi:10,where:"Target / Amazon"},
-  {id:129,cat:"Cleaning",name:"Paper towels",pri:"Day 1",lo:10,hi:18,where:"Target / Grocery / Costco"},
-  {id:130,cat:"Cleaning",name:"Tub & tile cleaner",pri:"Week 1",lo:5,hi:10,where:"Target / Grocery"}
+  {id:1,cat:"Bedroom",name:"Mattress (Purple)",pri:"Day 1",cost:1350,where:"Purple.com / Mattress Firm"},
+  {id:2,cat:"Bedroom",name:"Bed frame with headboard",pri:"Day 1",cost:450,where:"IKEA / Article / Wayfair"},
+  {id:3,cat:"Bedroom",name:"Nightstand(s)",pri:"Week 1",cost:140,where:"IKEA / Target / Wayfair"},
+  {id:4,cat:"Bedroom",name:"Vanity",pri:"Week 1",cost:225,where:"IKEA / Wayfair"},
+  {id:4.5,cat:"Bedroom",name:"Desk",pri:"Week 1",cost:175,where:"IKEA / Amazon"},
+  {id:5,cat:"Bedroom",name:"Curtains",pri:"Week 1",cost:60,where:"IKEA / Target"},
+  {id:6,cat:"Bedroom",name:"Bedding set",pri:"Day 1",cost:140,where:"Target / Amazon / HomeGoods"},
+  {id:7,cat:"Bedroom",name:"Pillows",pri:"Day 1",cost:70,where:"Target / Amazon"},
+  {id:8,cat:"Bedroom",name:"Decorative pillows",pri:"Anytime",cost:45,where:"HomeGoods / Target"},
+  {id:9,cat:"Bedroom",name:"Fan",pri:"Week 1",cost:55,where:"Target / Amazon"},
+  {id:10,cat:"Bedroom",name:"Small trash can",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:11,cat:"Bedroom",name:"Laundry baskets",pri:"Day 1",cost:30,where:"Target / Amazon"},
+  {id:12,cat:"Living Room",name:"Couch",pri:"Week 1",cost:650,where:"IKEA / Wayfair / Article"},
+  {id:13,cat:"Living Room",name:"Coffee table",pri:"Week 1",cost:200,where:"IKEA / Wayfair"},
+  {id:14,cat:"Living Room",name:"Decorative pillows",pri:"Anytime",cost:45,where:"HomeGoods / Target"},
+  {id:15,cat:"Living Room",name:"Blankets",pri:"Week 1",cost:55,where:"Target / Amazon"},
+  {id:16,cat:"Living Room",name:"Curtains",pri:"Week 1",cost:55,where:"IKEA / Target"},
+  {id:17,cat:"Living Room",name:"TV console",pri:"Week 1",cost:275,where:"IKEA / Wayfair"},
+  {id:18,cat:"Living Room",name:"TV",pri:"Week 1",cost:450,where:"Best Buy / Costco / Amazon"},
+  {id:19,cat:"Living Room",name:"Lamp",pri:"Week 1",cost:55,where:"Target / IKEA"},
+  {id:20,cat:"Living Room",name:"Coasters",pri:"Anytime",cost:15,where:"Target / Amazon"},
+  {id:21,cat:"Living Room",name:"Key bowl",pri:"Anytime",cost:20,where:"HomeGoods / Amazon"},
+  {id:21.5,cat:"Living Room",name:"Area rug",pri:"Week 1",cost:165,where:"HomeGoods / Wayfair / IKEA"},
+  {id:21.6,cat:"Living Room",name:"End table(s)",pri:"Week 1",cost:100,where:"IKEA / Wayfair / Target"},
+  {id:22,cat:"Dining",name:"Dining table",pri:"Week 1",cost:350,where:"IKEA / Wayfair"},
+  {id:23,cat:"Dining",name:"Dining chairs (set of 2-4)",pri:"Week 1",cost:200,where:"IKEA / Wayfair"},
+  {id:23.5,cat:"Dining",name:"Napkins",pri:"Week 1",cost:15,where:"Target / HomeGoods"},
+  {id:23.6,cat:"Dining",name:"Table runner",pri:"Anytime",cost:25,where:"HomeGoods / Target"},
+  {id:26,cat:"Dining",name:"Silverware set",pri:"Day 1",cost:38,where:"IKEA / Target"},
+  {id:27,cat:"Dining",name:"Straws",pri:"Anytime",cost:10,where:"Amazon / Target"},
+  {id:33,cat:"Dining",name:"Serving spoons/forks",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:48,cat:"Dining",name:"Salt & pepper shakers",pri:"Week 1",cost:15,where:"Target / HomeGoods"},
+  {id:50,cat:"Dining",name:"Fruit bowl",pri:"Anytime",cost:23,where:"HomeGoods / Target"},
+  {id:51,cat:"Dining",name:"Serving bowls",pri:"Week 1",cost:35,where:"Target / Amazon"},
+  {id:53,cat:"Dining",name:"Plates set",pri:"Day 1",cost:38,where:"IKEA / Target"},
+  {id:54,cat:"Dining",name:"Bowls set",pri:"Day 1",cost:30,where:"IKEA / Target"},
+  {id:55,cat:"Dining",name:"Cups / glasses",pri:"Day 1",cost:25,where:"IKEA / Target"},
+  {id:56,cat:"Dining",name:"Mugs",pri:"Week 1",cost:23,where:"Target / HomeGoods"},
+  {id:61,cat:"Dining",name:"Placemats",pri:"Anytime",cost:23,where:"Target / HomeGoods"},
+  {id:24,cat:"Kitchen",name:"Pot set (1L, 1M, 2S)",pri:"Day 1",cost:90,where:"Amazon / Target / TJ Maxx"},
+  {id:25,cat:"Kitchen",name:"Pan set (1L, 1M, 1S)",pri:"Day 1",cost:75,where:"Amazon / Target / TJ Maxx"},
+  {id:28,cat:"Kitchen",name:"Spatula",pri:"Day 1",cost:12,where:"Target / Amazon"},
+  {id:29,cat:"Kitchen",name:"Whisk",pri:"Week 1",cost:10,where:"Target / Amazon"},
+  {id:30,cat:"Kitchen",name:"Ladle",pri:"Week 1",cost:10,where:"Target / Amazon"},
+  {id:31,cat:"Kitchen",name:"Tongs",pri:"Day 1",cost:12,where:"Target / Amazon"},
+  {id:32,cat:"Kitchen",name:"Wooden spoons",pri:"Week 1",cost:12,where:"Target / Amazon"},
+  {id:34,cat:"Kitchen",name:"Knife set",pri:"Day 1",cost:70,where:"Amazon / TJ Maxx"},
+  {id:34.5,cat:"Kitchen",name:"Oven mitts / pot holders",pri:"Day 1",cost:18,where:"Target / Amazon"},
+  {id:35,cat:"Kitchen",name:"Kitchen scissors",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:36,cat:"Kitchen",name:"Strainers",pri:"Week 1",cost:23,where:"Amazon / Target"},
+  {id:37,cat:"Kitchen",name:"Measuring cups (dry)",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:38,cat:"Kitchen",name:"Measuring cups (wet)",pri:"Week 1",cost:12,where:"Target / Amazon"},
+  {id:39,cat:"Kitchen",name:"Measuring spoons",pri:"Week 1",cost:12,where:"Target / Amazon"},
+  {id:40,cat:"Kitchen",name:"Cheese grater",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:41,cat:"Kitchen",name:"Vegetable peeler",pri:"Week 1",cost:8,where:"Target / Amazon"},
+  {id:42,cat:"Kitchen",name:"Garlic press",pri:"Anytime",cost:12,where:"Target / Amazon"},
+  {id:43,cat:"Kitchen",name:"Blender",pri:"Week 1",cost:60,where:"Amazon / Target"},
+  {id:44,cat:"Kitchen",name:"Air fryer / toaster oven",pri:"Week 1",cost:105,where:"Amazon / Target / Costco"},
+  {id:45,cat:"Kitchen",name:"Wine opener",pri:"Anytime",cost:18,where:"Target / Amazon"},
+  {id:46,cat:"Kitchen",name:"Teapot",pri:"Anytime",cost:35,where:"Amazon / HomeGoods"},
+  {id:47,cat:"Kitchen",name:"Kitchen towels",pri:"Day 1",cost:18,where:"Target / IKEA"},
+  {id:49,cat:"Kitchen",name:"Towel holder",pri:"Week 1",cost:23,where:"Amazon / Target"},
+  {id:52,cat:"Kitchen",name:"Pyrex / glass containers",pri:"Week 1",cost:38,where:"Target / Amazon"},
+  {id:57,cat:"Kitchen",name:"Large trash can",pri:"Day 1",cost:38,where:"Target / Amazon"},
+  {id:58,cat:"Kitchen",name:"Can opener",pri:"Week 1",cost:12,where:"Target / Amazon"},
+  {id:59,cat:"Kitchen",name:"Baking sheet",pri:"Week 1",cost:23,where:"Amazon / Target"},
+  {id:60,cat:"Kitchen",name:"Food storage containers",pri:"Week 1",cost:38,where:"Target / Amazon"},
+  {id:62,cat:"Kitchen",name:"Dish drying mat",pri:"Day 1",cost:15,where:"Target / Amazon"},
+  {id:63,cat:"Kitchen",name:"Cutting boards (set)",pri:"Day 1",cost:30,where:"Target / Amazon"},
+  {id:64,cat:"Kitchen",name:"Coffee maker",pri:"Week 1",cost:55,where:"Amazon / Target"},
+  {id:65,cat:"Kitchen",name:"Paper towel holder",pri:"Week 1",cost:18,where:"Target / Amazon"},
+  {id:200,cat:"Pantry",name:"Cooking oil",pri:"Day 1",cost:12,where:"Grocery / Costco"},
+  {id:201,cat:"Pantry",name:"Salt",pri:"Day 1",cost:5,where:"Grocery"},
+  {id:202,cat:"Pantry",name:"Pepper",pri:"Day 1",cost:5,where:"Grocery"},
+  {id:203,cat:"Pantry",name:"Basic spices",pri:"Week 1",cost:23,where:"Grocery / Costco"},
+  {id:204,cat:"Pantry",name:"Sugar",pri:"Week 1",cost:5,where:"Grocery"},
+  {id:205,cat:"Pantry",name:"All-purpose flour",pri:"Week 1",cost:6,where:"Grocery"},
+  {id:206,cat:"Pantry",name:"Soy sauce",pri:"Week 1",cost:5,where:"Grocery"},
+  {id:207,cat:"Pantry",name:"Hot sauce",pri:"Week 1",cost:5,where:"Grocery"},
+  {id:208,cat:"Pantry",name:"Olive oil / butter",pri:"Day 1",cost:12,where:"Grocery / Costco"},
+  {id:209,cat:"Pantry",name:"Aluminum foil",pri:"Week 1",cost:6,where:"Grocery / Target"},
+  {id:210,cat:"Pantry",name:"Plastic wrap / zip-lock bags",pri:"Week 1",cost:9,where:"Grocery / Target"},
+  {id:66,cat:"Bathroom",name:"Bath mat",pri:"Day 1",cost:30,where:"Target / HomeGoods"},
+  {id:67,cat:"Bathroom",name:"Shower curtain",pri:"Day 1",cost:35,where:"Target / IKEA"},
+  {id:68,cat:"Bathroom",name:"Shower curtain liner",pri:"Day 1",cost:15,where:"Target / Amazon"},
+  {id:69,cat:"Bathroom",name:"Shower curtain rings/hooks",pri:"Day 1",cost:12,where:"Target / Amazon"},
+  {id:70,cat:"Bathroom",name:"Hand towels",pri:"Day 1",cost:23,where:"Target / HomeGoods"},
+  {id:71,cat:"Bathroom",name:"Bath towels",pri:"Day 1",cost:38,where:"Target / HomeGoods"},
+  {id:72,cat:"Bathroom",name:"Shower caddy",pri:"Day 1",cost:30,where:"Amazon / Target"},
+  {id:73,cat:"Bathroom",name:"Towel hooks",pri:"Week 1",cost:23,where:"Amazon / Target"},
+  {id:74,cat:"Bathroom",name:"Toilet wand / brush",pri:"Week 1",cost:12,where:"Target / Amazon"},
+  {id:75,cat:"Bathroom",name:"Plunger",pri:"Day 1",cost:15,where:"Target / Amazon"},
+  {id:76,cat:"Bathroom",name:"Soap dispenser",pri:"Week 1",cost:15,where:"Target / HomeGoods"},
+  {id:77,cat:"Bathroom",name:"Small trash can",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:78,cat:"Bathroom",name:"Squatty Potty",pri:"Anytime",cost:32,where:"Amazon / Target"},
+  {id:79,cat:"Bathroom",name:"Bidet",pri:"Anytime",cost:55,where:"Amazon"},
+  {id:80,cat:"Bathroom",name:"Flushable wipes + holder",pri:"Week 1",cost:16,where:"Target / Amazon"},
+  {id:81,cat:"Bathroom",name:"Hand soap",pri:"Day 1",cost:6,where:"Target / Grocery"},
+  {id:82,cat:"Bathroom",name:"Toilet paper",pri:"Day 1",cost:16,where:"Target / Costco / Grocery"},
+  {id:83,cat:"Bathroom",name:"Toilet paper holder",pri:"Week 1",cost:23,where:"Amazon / Target"},
+  {id:83.5,cat:"Bathroom",name:"Toilet bowl cleaner",pri:"Day 1",cost:6,where:"Target / Grocery"},
+  {id:84,cat:"Misc",name:"Wagon",pri:"Anytime",cost:100,where:"Amazon / Target"},
+  {id:85,cat:"Misc",name:"First aid kit",pri:"Day 1",cost:30,where:"Target / Amazon"},
+  {id:86,cat:"Misc",name:"Vacuum",pri:"Week 1",cost:140,where:"Amazon / Target / Costco"},
+  {id:87,cat:"Misc",name:"Broom",pri:"Week 1",cost:30,where:"Target / Amazon"},
+  {id:88,cat:"Misc",name:"Swiffer",pri:"Week 1",cost:40,where:"Target / Amazon"},
+  {id:89,cat:"Misc",name:"Duster",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:91,cat:"Misc",name:"Basic tool kit",pri:"Day 1",cost:45,where:"Home Depot / Amazon"},
+  {id:92,cat:"Misc",name:"Welcome mat",pri:"Week 1",cost:30,where:"Target / Amazon"},
+  {id:93,cat:"Misc",name:"Shoe rack (closet)",pri:"Week 1",cost:35,where:"Amazon / IKEA"},
+  {id:94,cat:"Misc",name:"Medicine kit",pri:"Week 1",cost:38,where:"Target / CVS"},
+  {id:95,cat:"Misc",name:"Clothing hangers",pri:"Day 1",cost:20,where:"Target / Amazon"},
+  {id:96,cat:"Misc",name:"Full length mirror",pri:"Week 1",cost:70,where:"IKEA / Target"},
+  {id:97,cat:"Misc",name:"Organizers",pri:"Week 1",cost:42,where:"Target / Amazon / IKEA"},
+  {id:98,cat:"Misc",name:"Lighter",pri:"Week 1",cost:8,where:"Target / CVS"},
+  {id:99,cat:"Misc",name:"Lightbulbs",pri:"Day 1",cost:23,where:"Target / Home Depot"},
+  {id:100,cat:"Misc",name:"Batteries",pri:"Week 1",cost:16,where:"Target / Amazon"},
+  {id:101,cat:"Misc",name:"Command hooks",pri:"Week 1",cost:15,where:"Target / Amazon"},
+  {id:102,cat:"Misc",name:"Level",pri:"Anytime",cost:15,where:"Home Depot / Amazon"},
+  {id:103,cat:"Misc",name:"Flashlight",pri:"Week 1",cost:18,where:"Target / Amazon"},
+  {id:104,cat:"Misc",name:"Extension cords",pri:"Day 1",cost:23,where:"Target / Amazon"},
+  {id:105,cat:"Misc",name:"Power strips",pri:"Day 1",cost:30,where:"Amazon / Target"},
+  {id:106,cat:"Misc",name:"Bug spray",pri:"Week 1",cost:12,where:"Target / Grocery"},
+  {id:107,cat:"Misc",name:"Air purifier",pri:"Week 1",cost:140,where:"Amazon / Target / Costco"},
+  {id:108,cat:"Misc",name:"Ring alarm",pri:"Anytime",cost:150,where:"Amazon / Best Buy"},
+  {id:109,cat:"Misc",name:"Iron",pri:"Anytime",cost:45,where:"Target / Amazon"},
+  {id:110,cat:"Misc",name:"Ironing board",pri:"Anytime",cost:38,where:"Target / Amazon"},
+  {id:111,cat:"Cleaning",name:"Windex",pri:"Week 1",cost:6,where:"Target / Grocery"},
+  {id:112,cat:"Cleaning",name:"Clorox wipes",pri:"Day 1",cost:10,where:"Target / Grocery"},
+  {id:113,cat:"Cleaning",name:"Clorox spray",pri:"Week 1",cost:7,where:"Target / Grocery"},
+  {id:114,cat:"Cleaning",name:"Fabuloso",pri:"Week 1",cost:8,where:"Target / Grocery"},
+  {id:115,cat:"Cleaning",name:"Magic eraser",pri:"Week 1",cost:7,where:"Target / Grocery"},
+  {id:116,cat:"Cleaning",name:"Laundry detergent",pri:"Day 1",cost:20,where:"Target / Grocery / Costco"},
+  {id:117,cat:"Cleaning",name:"Dryer sheets",pri:"Day 1",cost:9,where:"Target / Grocery"},
+  {id:118,cat:"Cleaning",name:"Dishwasher soap / pods",pri:"Week 1",cost:14,where:"Target / Grocery"},
+  {id:119,cat:"Cleaning",name:"Sponges",pri:"Day 1",cost:6,where:"Target / Grocery"},
+  {id:120,cat:"Cleaning",name:"Tissues",pri:"Week 1",cost:6,where:"Target / Grocery"},
+  {id:121,cat:"Cleaning",name:"Trash bags",pri:"Day 1",cost:12,where:"Target / Grocery / Costco"},
+  {id:122,cat:"Cleaning",name:"Toothpaste",pri:"Day 1",cost:6,where:"Target / Grocery"},
+  {id:123,cat:"Cleaning",name:"Shampoo",pri:"Day 1",cost:12,where:"Target / Grocery"},
+  {id:124,cat:"Cleaning",name:"Conditioner",pri:"Day 1",cost:12,where:"Target / Grocery"},
+  {id:125,cat:"Cleaning",name:"Microfiber cloths",pri:"Week 1",cost:12,where:"Target / Amazon"},
+  {id:126,cat:"Cleaning",name:"Draino",pri:"Week 1",cost:10,where:"Target / Home Depot"},
+  {id:127,cat:"Cleaning",name:"Dish soap",pri:"Day 1",cost:6,where:"Target / Grocery"},
+  {id:128,cat:"Cleaning",name:"Cleaning gloves",pri:"Week 1",cost:8,where:"Target / Amazon"},
+  {id:129,cat:"Cleaning",name:"Paper towels",pri:"Day 1",cost:14,where:"Target / Grocery / Costco"},
+  {id:130,cat:"Cleaning",name:"Tub & tile cleaner",pri:"Week 1",cost:8,where:"Target / Grocery"}
 ];
 
 var CATS = ["Bedroom","Living Room","Dining","Kitchen","Pantry","Bathroom","Misc","Cleaning"];
-var CAT_ICONS = {"Bedroom":"🛏️","Living Room":"🛋️","Dining":"🍽️","Kitchen":"🍳","Pantry":"🥙","Bathroom":"🚿","Misc":"📦","Cleaning":"🧹"};
+var DEFAULT_CAT_DISPLAY = {"Bedroom":"🛏️ Bedroom","Living Room":"🛋️ Living Room","Dining":"🍽️ Dining","Kitchen":"🍳 Kitchen","Pantry":"🥙 Pantry","Bathroom":"🚿 Bathroom","Misc":"📦 Misc","Cleaning":"🧹 Cleaning"};
 var PRIORITIES = ["Day 1","Week 1","Anytime"];
 var PRI_STYLE = {
   "Day 1":{bg:"#FEE2E2",text:"#991B1B",border:"#FECACA"},
@@ -279,14 +278,13 @@ var PRI_STYLE = {
 };
 var KEY = "fremont-checklist-v1";
 
-// Calculate total budget (sum of all high estimates)
-var totalLo = 0, totalHi = 0;
-BASE.forEach(function(i){ totalLo += Number(i.lo)||0; totalHi += Number(i.hi)||0; });
+// Calculate total budget (sum of all costs)
+var totalCost = 0;
+BASE.forEach(function(i){ totalCost += Number(i.cost)||0; });
 
 // All categories = built-in + any custom ones the user added
 function allCats(){ return CATS.concat(state.customCats || []); }
-function catIcon(c){ return CAT_ICONS[c] || "📦"; } // default: box emoji
-function catDisplay(c){ return (state.catNames && state.catNames[c]) ? state.catNames[c] : c; }
+function catDisplay(c){ return (state.catNames && state.catNames[c]) ? state.catNames[c] : DEFAULT_CAT_DISPLAY[c] || c; }
 
 // view preferences (per-device, not synced)
 var PREF_KEY = "fremont-checklist-prefs";
@@ -301,7 +299,7 @@ function savePrefs(){
 var state = {
   checked:{}, edits:{}, custom:[], customCats:[], catNames:{}, collapsed:{},
   editId:null, draftEdits:null, addingTo:null,
-  draft:{name:"",pri:"Week 1",where:"",lo:"",hi:""},
+  draft:{name:"",pri:"Week 1",where:"",cost:""},
   confirmId:null, catFilter:"All", priFilter:"All", showHiddenSec:false,
   syncStatus:"connecting",
   addingCat:false, newCatName:"",
@@ -421,20 +419,7 @@ function esc(s){
 function dispName(item){ var v=fieldOf(item.id,"name"); return (v===undefined||v===null)?item.name:v; }
 function dispPri(item){ var v=fieldOf(item.id,"pri"); return (v===undefined||v===null)?item.pri:v; }
 function dispWhere(item){ var v=fieldOf(item.id,"where"); return (v===undefined||v===null)?item.where:v; }
-function dispLo(item){ var v=fieldOf(item.id,"lo"); return (v===undefined||v===null)?item.lo:v; }
-function dispHi(item){ var v=fieldOf(item.id,"hi"); return (v===undefined||v===null)?item.hi:v; }
-// Single cost. Prefers an explicit cost (edit override or custom item),
-// otherwise collapses any old low/high range to one representative number.
-function dispCost(item){
-  var ec = fieldOf(item.id,"cost");
-  if(ec!==undefined && ec!==null && ec!=="") return Number(ec)||0;
-  if(item.cost!==undefined && item.cost!==null) return Number(item.cost)||0;
-  var elo = fieldOf(item.id,"lo"), ehi = fieldOf(item.id,"hi");
-  var lo = (elo!==undefined&&elo!==null)?Number(elo):(Number(item.lo)||0);
-  var hi = (ehi!==undefined&&ehi!==null)?Number(ehi):(Number(item.hi)||0);
-  if(lo&&hi) return Math.round((lo+hi)/2);
-  return hi||lo||0;
-}
+function dispCost(item){ var v=fieldOf(item.id,"cost"); return (v===undefined||v===null)?Number(item.cost)||0:Number(v)||0; }
 function dispNote(item){ var v=fieldOf(item.id,"note"); return v?v:""; }
 function dispLink(item){ var v=fieldOf(item.id,"link"); return v?v:""; }
 function dispAssignee(item){ var v=fieldOf(item.id,"assignee"); return v?v:""; }
@@ -479,10 +464,9 @@ function render(){
   // budgets over ALL visible items (stable regardless of filter)
   var spent=0, left=0;
   visible.forEach(function(i){
-    var cost = Number(dispCost(i))||0;
+    var cost = dispCost(i);
     if(state.checked[i.id]){ spent+=cost; } else { left+=cost; }
   });
-  var total = spent+left;
 
   var h = "";
 
@@ -498,14 +482,14 @@ function render(){
   h += '<div class="stat"><div class="k">Bought (est.)</div><div class="v green">'+fmt(spent)+'</div></div>';
   h += '<div class="stat"><div class="k">Left to buy (est.) &middot; '+stillNeed+' items</div><div class="v">'+fmt(left)+'</div></div>';
   h += '</div>';
-  h += '<p style="margin-top:10px;font-size:12px;color:#A8A29E;">Full apartment estimate: <span style="color:#F5F0E8;font-weight:600;">'+fmt(totalLo)+' &ndash; '+fmt(totalHi)+'</span></p>';
+  h += '<p style="margin-top:10px;font-size:12px;color:#A8A29E;">Full apartment estimate: <span style="color:#F5F0E8;font-weight:600;">'+fmt(totalCost)+'</span></p>';
   h += '</div></div>';
 
   /* Filters */
   h += '<div class="filters"><div class="wrap">';
   h += '<div class="srow">';
   ["All"].concat(allCats()).forEach(function(c){
-    h += '<button class="cbtn'+(state.catFilter===c?' on':'')+'" data-act="catfilter" data-cat="'+esc(c)+'">'+(c!=="All"?catIcon(c)+" ":"")+esc(c)+'</button>';
+    h += '<button class="cbtn'+(state.catFilter===c?' on':'')+'" data-act="catfilter" data-cat="'+esc(c)+'">'+esc(c)+'</button>';
   });
   h += '</div>';
   h += '<div class="prow">';
@@ -550,7 +534,6 @@ function render(){
       h += '</div></div>';
     } else {
       h += '<div class="cathead" data-act="togglecat" data-cat="'+esc(cat)+'">';
-      h += '<span class="icon">'+catIcon(cat)+'</span>';
       h += '<h2>'+esc(catDisplay(cat))+'</h2>';
       h += '<span class="count">'+catDone+'/'+items.length+'</span>';
       h += '<button class="catedit" data-act="renamecat" data-cat="'+esc(cat)+'" title="Rename category">✏️</button>';
@@ -578,7 +561,7 @@ function render(){
     if(state.addingCat){
       h += '<div class="addform" data-stop="1" style="margin-bottom:24px;">';
       h += '<label class="lbl" style="margin-bottom:6px;">New category</label>';
-      h += '<input class="inp" data-field="newcat" value="'+esc(state.newCatName)+'" placeholder="e.g. Garage, Office, Patio">';
+      h += '<input class="inp" data-field="newcat" value="'+esc(state.newCatName)+'" placeholder="e.g. 🏠 Garage, 💼 Office">';
       h += '<div style="display:flex;gap:8px;margin-top:14px;">';
       h += '<button class="sbtn"'+(state.newCatName.trim()?'':' disabled')+' data-act="submitaddcat">Add category</button>';
       h += '<button class="xbtn" data-act="canceladdcat">Cancel</button>';
@@ -592,8 +575,7 @@ function render(){
   if(hiddenCt>0){
     h += '<div class="cat hidsec">';
     h += '<div class="cathead" data-act="togglehidden">';
-    h += '<span class="icon">🙈</span>';
-    h += '<h2>Hidden items</h2>';
+    h += '<h2>🙈 Hidden items</h2>';
     h += '<span class="count">'+hiddenCt+' item'+(hiddenCt!==1?'s':'')+'</span>';
     h += '<span class="chev'+(state.showHiddenSec?'':' closed')+'">\u25BC</span>';
     h += '</div>';
@@ -652,8 +634,8 @@ function itemCard(item){
   var open = state.editId===item.id;
   var pri = dispPri(item);
   var ps = PRI_STYLE[pri] || PRI_STYLE["Week 1"];
-  var lo = dispLo(item), hi = dispHi(item);
   var where = dispWhere(item);
+  var cost = dispCost(item);
   var note = dispNote(item);
   var link = dispLink(item);
   var pending = state.confirmId===item.id;
@@ -668,7 +650,7 @@ function itemCard(item){
   c += '<div style="margin-bottom:5px;"><span class="iname">'+esc(dispName(item))+'</span></div>';
   c += '<div class="meta">';
   c += '<span class="pill" style="background:'+ps.bg+';color:'+ps.text+';border:1px solid '+ps.border+';">'+esc(pri)+'</span>';
-  if(Number(lo)||Number(hi)){ c += '<span class="cost">'+fmt(lo)+'&ndash;'+fmt(hi)+'</span>'; }
+  if(cost){ c += '<span class="cost">'+fmt(cost)+'</span>'; }
   if(where && where!=="-"){ c += '<span class="where">🛒 '+esc(where)+'</span>'; }
   var who = dispAssignee(item);
   if(who){ c += '<span class="assignee">👤 '+esc(who)+'</span>'; }
@@ -701,10 +683,8 @@ function itemCard(item){
     c += '<label class="lbl" style="margin-top:12px;">Where to buy</label>';
     c += '<input class="inp" data-field="where" value="'+esc(d.where)+'" placeholder="e.g. Amazon, Target">';
 
-    c += '<div class="grid2" style="margin-top:12px;">';
-    c += '<div><label class="lbl" style="margin-bottom:4px;">Cost low ($)</label><input class="inp" type="number" data-field="lo" value="'+esc(d.lo)+'"></div>';
-    c += '<div><label class="lbl" style="margin-bottom:4px;">Cost high ($)</label><input class="inp" type="number" data-field="hi" value="'+esc(d.hi)+'"></div>';
-    c += '</div>';
+    c += '<label class="lbl" style="margin-top:12px;">Cost ($)</label>';
+    c += '<input class="inp" type="number" data-field="cost" value="'+esc(d.cost)+'" placeholder="0">';
 
     c += '<label class="lbl" style="margin-top:12px;">Note</label>';
     c += '<textarea class="inp" rows="2" data-field="note" placeholder="Any notes">'+esc(d.note)+'</textarea>';
@@ -752,10 +732,8 @@ function addForm(cat){
   c += '</div>';
   c += '<label class="lbl" style="margin-top:10px;margin-bottom:4px;">Where to buy</label>';
   c += '<input class="inp" data-field="add-where" value="'+esc(d.where)+'" placeholder="e.g. Amazon / Target">';
-  c += '<div class="grid2" style="margin-top:10px;">';
-  c += '<div><label class="lbl" style="margin-bottom:4px;">Cost low ($)</label><input class="inp" type="number" data-field="add-lo" value="'+esc(d.lo)+'"></div>';
-  c += '<div><label class="lbl" style="margin-bottom:4px;">Cost high ($)</label><input class="inp" type="number" data-field="add-hi" value="'+esc(d.hi)+'"></div>';
-  c += '</div>';
+  c += '<label class="lbl" style="margin-top:10px;margin-bottom:4px;">Cost ($)</label>';
+  c += '<input class="inp" type="number" data-field="add-cost" value="'+esc(d.cost)+'" placeholder="0">';
   c += '<div style="display:flex;gap:8px;margin-top:14px;">';
   c += '<button class="sbtn"'+(d.name.trim()?'':' disabled')+' data-act="submitadd" data-cat="'+esc(cat)+'">Add</button>';
   c += '<button class="xbtn" data-act="canceladd">Cancel</button>';
@@ -768,7 +746,7 @@ function addForm(cat){
 function initDraft(item){
   return {
     name: dispName(item), pri: dispPri(item), where: dispWhere(item),
-    lo: dispLo(item), hi: dispHi(item), note: dispNote(item), link: dispLink(item),
+    cost: dispCost(item), note: dispNote(item), link: dispLink(item),
     assignee: dispAssignee(item)
   };
 }
@@ -823,7 +801,7 @@ function handleClick(e){
     case "restore":
       setHidden(id,false); render(); break;
     case "showadd":
-      state.addingTo = cat; state.draft = {name:"",pri:"Week 1",where:"",lo:"",hi:""}; render(); break;
+      state.addingTo = cat; state.draft = {name:"",pri:"Week 1",where:"",cost:""}; render(); break;
     case "canceladd":
       state.addingTo = null; render(); break;
     case "addsetpri":
@@ -869,7 +847,7 @@ function commitEdit(rawId){
   var d = state.draftEdits || {};
   var e = ensureEdits(id);
   e.name = d.name; e.pri = d.pri; e.where = d.where;
-  e.lo = Number(d.lo)||0; e.hi = Number(d.hi)||0;
+  e.cost = Number(d.cost)||0;
   e.note = d.note; e.link = d.link; e.assignee = d.assignee;
   state.editId = null; state.draftEdits = null; state.confirmId = null;
   persist(); render();
@@ -897,9 +875,9 @@ function submitAdd(cat){
   if(!d.name.trim()) return;
   state.custom.push({
     id:"c_"+Date.now(), cat:cat, name:d.name.trim(), pri:d.pri,
-    where:(d.where.trim()||"-"), lo:Number(d.lo)||0, hi:Number(d.hi)||0
+    where:(d.where.trim()||"-"), cost:Number(d.cost)||0
   });
-  state.draft = {name:"",pri:"Week 1",where:"",lo:"",hi:""};
+  state.draft = {name:"",pri:"Week 1",where:"",cost:""};
   state.addingTo = null;
   persist(); render();
 }
