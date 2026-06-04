@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fremont Move-In Checklist</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#F5F0E8; --ink:#1C1917; --muted:#78716C; --accent:#C4623A;
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  html,body{background:var(--bg);}
+  body{font-family:var(--sans);color:var(--ink);min-height:640px;}
+  h1,h2{font-family:var(--serif);}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:#EDE8DF;}
+  ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px;}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+  .header{background:var(--ink);color:var(--bg);padding:28px 20px 24px;}
+  .wrap{max-width:680px;margin:0 auto;}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;color:#A8A29E;text-transform:uppercase;margin-bottom:6px;}
+  .title{font-size:28px;font-weight:700;line-height:1.2;margin-bottom:16px;}
+  .progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px;}
+  .progress-row .left{color:#A8A29E;}
+  .progress-row .pct{font-weight:600;color:var(--accent);}
+  .progress-row .pct.done{color:#86EFAC;}
+  .bar{height:6px;background:#3C3836;border-radius:3px;overflow:hidden;}
+  .bar > div{height:100%;background:linear-gradient(90deg,#C4623A,#E8895A);border-radius:3px;transition:width .3s;}
+  .info{margin-top:14px;background:#2C2927;border-radius:10px;padding:10px 14px;font-size:11px;color:#A8A29E;}
+  .cards{margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;}
+  .stat{background:#2C2927;border-radius:10px;padding:10px 16px;flex:1;min-width:140px;}
+  .stat .k{font-size:11px;color:#A8A29E;margin-bottom:2px;}
+  .stat .v{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--bg);}
+  .stat .v.green{color:#86EFAC;}
+
+  .filters{background:#EDE8DF;border-bottom:1px solid #D6CFC5;padding:12px 16px;}
+  .srow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;}
+  .srow::-webkit-scrollbar{display:none;}
+  .cbtn{cursor:pointer;border:none;background:#EDE8DF;color:var(--muted);padding:8px 14px;border-radius:20px;font-family:var(--sans);font-size:13px;font-weight:500;white-space:nowrap;transition:all .15s;}
+  .cbtn:hover{background:#E2D9CE;color:#44403C;}
+  .cbtn.on{background:var(--accent);color:#fff;}
+  .prow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .pbtn{cursor:pointer;border:1.5px solid #D6CFC5;background:transparent;color:var(--muted);padding:6px 14px;border-radius:20px;font-family:var(--sans);font-size:12px;font-weight:500;transition:all .15s;}
+
+  .list{max-width:680px;margin:0 auto;padding:16px;}
+  .cat{margin-bottom:24px;}
+  .cathead{display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;user-select:none;}
+  .cathead:hover h2{color:var(--accent);}
+  .cathead .icon{font-size:18px;}
+  .cathead h2{font-size:17px;font-weight:600;transition:color .15s;}
+  .cathead .count{font-size:12px;color:#A8A29E;}
+  .chev{font-size:11px;color:#A8A29E;transition:transform .2s;margin-left:auto;}
+  .chev.closed{transform:rotate(-90deg);}
+
+  .items{display:flex;flex-direction:column;gap:6px;}
+  .card{background:#fff;border-radius:12px;border:1.5px solid #F0EBE1;overflow:hidden;transition:border-color .1s;}
+  .card:hover{border-color:#DDD5C8;}
+  .card.editing{border-color:var(--accent);}
+  .card.done{opacity:.55;}
+  .card.hiddenrow{opacity:.6;}
+  .irow{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;cursor:pointer;}
+  .irow:hover{background:#FDFAF6;}
+  .box{width:20px;height:20px;border-radius:6px;border:2px solid #D6CFC5;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .box.on{background:var(--accent);border-color:var(--accent);}
+  .box svg{display:block;}
+  .iname{font-size:14px;font-weight:500;color:var(--ink);}
+  .card.done .iname{font-weight:400;text-decoration:line-through;color:#A8A29E;}
+  .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:5px;}
+  .pill{font-size:11px;font-weight:600;padding:2px 9px;border-radius:8px;}
+  .cost{font-size:12px;color:var(--muted);font-weight:500;}
+  .where{font-size:11px;background:#F0F6FF;color:#2563EB;border-radius:8px;padding:2px 8px;font-weight:500;}
+  .note{font-size:12px;color:var(--muted);margin-top:5px;font-style:italic;}
+  .linkchip{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:11px;color:#2563EB;text-decoration:none;background:#EFF6FF;border-radius:6px;padding:2px 8px;border:1px solid #BFDBFE;}
+  .eico{cursor:pointer;border:none;background:none;padding:4px 8px;border-radius:8px;font-size:14px;color:#C4C0B8;transition:all .15s;flex-shrink:0;}
+  .eico:hover,.eico.on{color:var(--accent);background:#FFF0EB;}
+
+  .panel{border-top:1px solid #F0EBE1;background:#FDFAF6;padding:14px;animation:slideDown .15s ease;}
+  .lbl{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em;display:block;}
+  .inp{width:100%;border:1.5px solid #E2D9CE;border-radius:8px;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none;transition:border-color .15s;}
+  .inp:focus{border-color:var(--accent);}
+  .inp::placeholder{color:#C4A99A;}
+  textarea.inp{resize:none;}
+  .ppill{cursor:pointer;border:1.5px solid #E2D9CE;background:none;color:var(--muted);border-radius:16px;padding:5px 14px;font-size:12px;font-weight:500;font-family:var(--sans);transition:all .15s;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .panel-foot{margin-top:14px;padding-top:12px;border-top:1px solid #F0EBE1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .sbtn{cursor:pointer;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-family:var(--sans);font-size:13px;font-weight:600;}
+  .sbtn:disabled{opacity:.4;cursor:default;}
+  .xbtn{cursor:pointer;background:none;border:1.5px solid #E2D9CE;border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:13px;color:var(--muted);}
+  .dbtn{cursor:pointer;background:none;border:1.5px solid #FECACA;border-radius:8px;padding:6px 14px;font-family:var(--sans);font-size:12px;font-weight:500;color:#991B1B;transition:all .15s;}
+  .dbtn:hover{background:#FEE2E2;}
+  .dbtn.confirm{background:#FEE2E2;font-weight:600;}
+  .addbtn{cursor:pointer;border:1.5px dashed #D6CFC5;background:none;border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:13px;color:#A8A29E;width:100%;text-align:left;transition:all .15s;display:flex;align-items:center;gap:6px;}
+  .addbtn:hover{border-color:var(--accent);color:var(--accent);background:#FFF8F6;}
+  .addform{background:#fff;border-radius:12px;border:1.5px solid var(--accent);padding:14px;animation:slideDown .15s ease;}
+  .restorebtn{cursor:pointer;background:none;border:1.5px solid #D6CFC5;border-radius:8px;padding:5px 12px;font-family:var(--sans);font-size:12px;font-weight:600;color:#44403C;white-space:nowrap;transition:all .15s;}
+  .restorebtn:hover{border-color:var(--accent);color:var(--accent);}
+  .hidsec .cathead{background:#EDE8DF;border-radius:10px;padding:10px 14px;}
+  .hidsec h2{font-size:16px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+"use strict";
+
+/* ─────────── Data ─────────── */
+var BASE = [
+  {id:1,cat:"Bedroom",name:"Mattress (Purple)",pri:"Day 1",lo:1200,hi:1500,where:"Purple.com / Mattress Firm"},
+  {id:2,cat:"Bedroom",name:"Bed frame with headboard",pri:"Day 1",lo:300,hi:600,where:"IKEA / Article / Wayfair"},
+  {id:3,cat:"Bedroom",name:"Nightstand(s)",pri:"Week 1",lo:80,hi:200,where:"IKEA / Target / Wayfair"},
+  {id:4,cat:"Bedroom",name:"Vanity",pri:"Week 1",lo:150,hi:300,where:"IKEA / Wayfair"},
+  {id:4.5,cat:"Bedroom",name:"Desk",pri:"Week 1",lo:100,hi:250,where:"IKEA / Amazon"},
+  {id:5,cat:"Bedroom",name:"Curtains",pri:"Week 1",lo:40,hi:80,where:"IKEA / Target"},
+  {id:6,cat:"Bedroom",name:"Bedding set",pri:"Day 1",lo:80,hi:200,where:"Target / Amazon / HomeGoods"},
+  {id:7,cat:"Bedroom",name:"Pillows",pri:"Day 1",lo:40,hi:100,where:"Target / Amazon"},
+  {id:8,cat:"Bedroom",name:"Decorative pillows",pri:"Anytime",lo:30,hi:60,where:"HomeGoods / Target"},
+  {id:9,cat:"Bedroom",name:"Fan",pri:"Week 1",lo:30,hi:80,where:"Target / Amazon"},
+  {id:10,cat:"Bedroom",name:"Small trash can",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:11,cat:"Bedroom",name:"Laundry baskets",pri:"Day 1",lo:20,hi:40,where:"Target / Amazon"},
+  {id:12,cat:"Living Room",name:"Couch",pri:"Week 1",lo:400,hi:900,where:"IKEA / Wayfair / Article"},
+  {id:13,cat:"Living Room",name:"Coffee table",pri:"Week 1",lo:100,hi:300,where:"IKEA / Wayfair"},
+  {id:14,cat:"Living Room",name:"Decorative pillows",pri:"Anytime",lo:30,hi:60,where:"HomeGoods / Target"},
+  {id:15,cat:"Living Room",name:"Blankets",pri:"Week 1",lo:30,hi:80,where:"Target / Amazon"},
+  {id:16,cat:"Living Room",name:"Curtains",pri:"Week 1",lo:30,hi:80,where:"IKEA / Target"},
+  {id:17,cat:"Living Room",name:"TV console",pri:"Week 1",lo:150,hi:400,where:"IKEA / Wayfair"},
+  {id:18,cat:"Living Room",name:"TV",pri:"Week 1",lo:300,hi:600,where:"Best Buy / Costco / Amazon"},
+  {id:19,cat:"Living Room",name:"Lamp",pri:"Week 1",lo:30,hi:80,where:"Target / IKEA"},
+  {id:20,cat:"Living Room",name:"Coasters",pri:"Anytime",lo:10,hi:20,where:"Target / Amazon"},
+  {id:21,cat:"Living Room",name:"Key bowl",pri:"Anytime",lo:10,hi:30,where:"HomeGoods / Amazon"},
+  {id:21.5,cat:"Living Room",name:"Area rug",pri:"Week 1",lo:80,hi:250,where:"HomeGoods / Wayfair / IKEA"},
+  {id:21.6,cat:"Living Room",name:"End table(s)",pri:"Week 1",lo:50,hi:150,where:"IKEA / Wayfair / Target"},
+  {id:22,cat:"Dining",name:"Dining table",pri:"Week 1",lo:200,hi:500,where:"IKEA / Wayfair"},
+  {id:23,cat:"Dining",name:"Dining chairs (set of 2-4)",pri:"Week 1",lo:100,hi:300,where:"IKEA / Wayfair"},
+  {id:23.5,cat:"Dining",name:"Napkins",pri:"Week 1",lo:10,hi:20,where:"Target / HomeGoods"},
+  {id:23.6,cat:"Dining",name:"Table runner",pri:"Anytime",lo:15,hi:35,where:"HomeGoods / Target"},
+  {id:26,cat:"Dining",name:"Silverware set",pri:"Day 1",lo:25,hi:50,where:"IKEA / Target"},
+  {id:27,cat:"Dining",name:"Straws",pri:"Anytime",lo:5,hi:15,where:"Amazon / Target"},
+  {id:33,cat:"Dining",name:"Serving spoons/forks",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:48,cat:"Dining",name:"Salt & pepper shakers",pri:"Week 1",lo:10,hi:20,where:"Target / HomeGoods"},
+  {id:50,cat:"Dining",name:"Fruit bowl",pri:"Anytime",lo:15,hi:30,where:"HomeGoods / Target"},
+  {id:51,cat:"Dining",name:"Serving bowls",pri:"Week 1",lo:20,hi:50,where:"Target / Amazon"},
+  {id:53,cat:"Dining",name:"Plates set",pri:"Day 1",lo:25,hi:50,where:"IKEA / Target"},
+  {id:54,cat:"Dining",name:"Bowls set",pri:"Day 1",lo:20,hi:40,where:"IKEA / Target"},
+  {id:55,cat:"Dining",name:"Cups / glasses",pri:"Day 1",lo:15,hi:35,where:"IKEA / Target"},
+  {id:56,cat:"Dining",name:"Mugs",pri:"Week 1",lo:15,hi:30,where:"Target / HomeGoods"},
+  {id:61,cat:"Dining",name:"Placemats",pri:"Anytime",lo:15,hi:30,where:"Target / HomeGoods"},
+  {id:24,cat:"Kitchen",name:"Pot set (1L, 1M, 2S)",pri:"Day 1",lo:60,hi:120,where:"Amazon / Target / TJ Maxx"},
+  {id:25,cat:"Kitchen",name:"Pan set (1L, 1M, 1S)",pri:"Day 1",lo:50,hi:100,where:"Amazon / Target / TJ Maxx"},
+  {id:28,cat:"Kitchen",name:"Spatula",pri:"Day 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:29,cat:"Kitchen",name:"Whisk",pri:"Week 1",lo:8,hi:12,where:"Target / Amazon"},
+  {id:30,cat:"Kitchen",name:"Ladle",pri:"Week 1",lo:8,hi:12,where:"Target / Amazon"},
+  {id:31,cat:"Kitchen",name:"Tongs",pri:"Day 1",lo:10,hi:15,where:"Target / Amazon"},
+  {id:32,cat:"Kitchen",name:"Wooden spoons",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:34,cat:"Kitchen",name:"Knife set",pri:"Day 1",lo:40,hi:100,where:"Amazon / TJ Maxx"},
+  {id:34.5,cat:"Kitchen",name:"Oven mitts / pot holders",pri:"Day 1",lo:10,hi:25,where:"Target / Amazon"},
+  {id:35,cat:"Kitchen",name:"Kitchen scissors",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:36,cat:"Kitchen",name:"Strainers",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
+  {id:37,cat:"Kitchen",name:"Measuring cups (dry)",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:38,cat:"Kitchen",name:"Measuring cups (wet)",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:39,cat:"Kitchen",name:"Measuring spoons",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:40,cat:"Kitchen",name:"Cheese grater",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:41,cat:"Kitchen",name:"Vegetable peeler",pri:"Week 1",lo:5,hi:10,where:"Target / Amazon"},
+  {id:42,cat:"Kitchen",name:"Garlic press",pri:"Anytime",lo:10,hi:15,where:"Target / Amazon"},
+  {id:43,cat:"Kitchen",name:"Blender",pri:"Week 1",lo:40,hi:80,where:"Amazon / Target"},
+  {id:44,cat:"Kitchen",name:"Air fryer / toaster oven",pri:"Week 1",lo:60,hi:150,where:"Amazon / Target / Costco"},
+  {id:45,cat:"Kitchen",name:"Wine opener",pri:"Anytime",lo:10,hi:25,where:"Target / Amazon"},
+  {id:46,cat:"Kitchen",name:"Teapot",pri:"Anytime",lo:20,hi:50,where:"Amazon / HomeGoods"},
+  {id:47,cat:"Kitchen",name:"Kitchen towels",pri:"Day 1",lo:12,hi:25,where:"Target / IKEA"},
+  {id:49,cat:"Kitchen",name:"Towel holder",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
+  {id:52,cat:"Kitchen",name:"Pyrex / glass containers",pri:"Week 1",lo:25,hi:50,where:"Target / Amazon"},
+  {id:57,cat:"Kitchen",name:"Large trash can",pri:"Day 1",lo:25,hi:50,where:"Target / Amazon"},
+  {id:58,cat:"Kitchen",name:"Can opener",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:59,cat:"Kitchen",name:"Baking sheet",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
+  {id:60,cat:"Kitchen",name:"Food storage containers",pri:"Week 1",lo:25,hi:50,where:"Target / Amazon"},
+  {id:62,cat:"Kitchen",name:"Dish drying mat",pri:"Day 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:63,cat:"Kitchen",name:"Cutting boards (set)",pri:"Day 1",lo:20,hi:40,where:"Target / Amazon"},
+  {id:64,cat:"Kitchen",name:"Coffee maker",pri:"Week 1",lo:30,hi:80,where:"Amazon / Target"},
+  {id:65,cat:"Kitchen",name:"Paper towel holder",pri:"Week 1",lo:12,hi:25,where:"Target / Amazon"},
+  {id:200,cat:"Pantry",name:"Cooking oil",pri:"Day 1",lo:8,hi:15,where:"Grocery / Costco"},
+  {id:201,cat:"Pantry",name:"Salt",pri:"Day 1",lo:3,hi:6,where:"Grocery"},
+  {id:202,cat:"Pantry",name:"Pepper",pri:"Day 1",lo:3,hi:6,where:"Grocery"},
+  {id:203,cat:"Pantry",name:"Basic spices",pri:"Week 1",lo:15,hi:30,where:"Grocery / Costco"},
+  {id:204,cat:"Pantry",name:"Sugar",pri:"Week 1",lo:3,hi:6,where:"Grocery"},
+  {id:205,cat:"Pantry",name:"All-purpose flour",pri:"Week 1",lo:4,hi:8,where:"Grocery"},
+  {id:206,cat:"Pantry",name:"Soy sauce",pri:"Week 1",lo:3,hi:6,where:"Grocery"},
+  {id:207,cat:"Pantry",name:"Hot sauce",pri:"Week 1",lo:3,hi:6,where:"Grocery"},
+  {id:208,cat:"Pantry",name:"Olive oil / butter",pri:"Day 1",lo:8,hi:15,where:"Grocery / Costco"},
+  {id:209,cat:"Pantry",name:"Aluminum foil",pri:"Week 1",lo:4,hi:8,where:"Grocery / Target"},
+  {id:210,cat:"Pantry",name:"Plastic wrap / zip-lock bags",pri:"Week 1",lo:6,hi:12,where:"Grocery / Target"},
+  {id:66,cat:"Bathroom",name:"Bath mat",pri:"Day 1",lo:20,hi:40,where:"Target / HomeGoods"},
+  {id:67,cat:"Bathroom",name:"Shower curtain",pri:"Day 1",lo:20,hi:50,where:"Target / IKEA"},
+  {id:68,cat:"Bathroom",name:"Shower curtain liner",pri:"Day 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:69,cat:"Bathroom",name:"Shower curtain rings/hooks",pri:"Day 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:70,cat:"Bathroom",name:"Hand towels",pri:"Day 1",lo:15,hi:30,where:"Target / HomeGoods"},
+  {id:71,cat:"Bathroom",name:"Bath towels",pri:"Day 1",lo:25,hi:50,where:"Target / HomeGoods"},
+  {id:72,cat:"Bathroom",name:"Shower caddy",pri:"Day 1",lo:20,hi:40,where:"Amazon / Target"},
+  {id:73,cat:"Bathroom",name:"Towel hooks",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
+  {id:74,cat:"Bathroom",name:"Toilet wand / brush",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:75,cat:"Bathroom",name:"Plunger",pri:"Day 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:76,cat:"Bathroom",name:"Soap dispenser",pri:"Week 1",lo:10,hi:20,where:"Target / HomeGoods"},
+  {id:77,cat:"Bathroom",name:"Small trash can",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:78,cat:"Bathroom",name:"Squatty Potty",pri:"Anytime",lo:25,hi:40,where:"Amazon / Target"},
+  {id:79,cat:"Bathroom",name:"Bidet",pri:"Anytime",lo:30,hi:80,where:"Amazon"},
+  {id:80,cat:"Bathroom",name:"Flushable wipes + holder",pri:"Week 1",lo:12,hi:20,where:"Target / Amazon"},
+  {id:81,cat:"Bathroom",name:"Hand soap",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
+  {id:82,cat:"Bathroom",name:"Toilet paper",pri:"Day 1",lo:12,hi:20,where:"Target / Costco / Grocery"},
+  {id:83,cat:"Bathroom",name:"Toilet paper holder",pri:"Week 1",lo:15,hi:30,where:"Amazon / Target"},
+  {id:83.5,cat:"Bathroom",name:"Toilet bowl cleaner",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
+  {id:84,cat:"Misc",name:"Wagon",pri:"Anytime",lo:50,hi:150,where:"Amazon / Target"},
+  {id:85,cat:"Misc",name:"First aid kit",pri:"Day 1",lo:20,hi:40,where:"Target / Amazon"},
+  {id:86,cat:"Misc",name:"Vacuum",pri:"Week 1",lo:80,hi:200,where:"Amazon / Target / Costco"},
+  {id:87,cat:"Misc",name:"Broom",pri:"Week 1",lo:20,hi:40,where:"Target / Amazon"},
+  {id:88,cat:"Misc",name:"Swiffer",pri:"Week 1",lo:30,hi:50,where:"Target / Amazon"},
+  {id:89,cat:"Misc",name:"Duster",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:91,cat:"Misc",name:"Basic tool kit",pri:"Day 1",lo:30,hi:60,where:"Home Depot / Amazon"},
+  {id:92,cat:"Misc",name:"Welcome mat",pri:"Week 1",lo:20,hi:40,where:"Target / Amazon"},
+  {id:93,cat:"Misc",name:"Shoe rack (closet)",pri:"Week 1",lo:20,hi:50,where:"Amazon / IKEA"},
+  {id:94,cat:"Misc",name:"Medicine kit",pri:"Week 1",lo:25,hi:50,where:"Target / CVS"},
+  {id:95,cat:"Misc",name:"Clothing hangers",pri:"Day 1",lo:15,hi:25,where:"Target / Amazon"},
+  {id:96,cat:"Misc",name:"Full length mirror",pri:"Week 1",lo:40,hi:100,where:"IKEA / Target"},
+  {id:97,cat:"Misc",name:"Organizers",pri:"Week 1",lo:25,hi:60,where:"Target / Amazon / IKEA"},
+  {id:98,cat:"Misc",name:"Lighter",pri:"Week 1",lo:5,hi:10,where:"Target / CVS"},
+  {id:99,cat:"Misc",name:"Lightbulbs",pri:"Day 1",lo:15,hi:30,where:"Target / Home Depot"},
+  {id:100,cat:"Misc",name:"Batteries",pri:"Week 1",lo:12,hi:20,where:"Target / Amazon"},
+  {id:101,cat:"Misc",name:"Command hooks",pri:"Week 1",lo:10,hi:20,where:"Target / Amazon"},
+  {id:102,cat:"Misc",name:"Level",pri:"Anytime",lo:10,hi:20,where:"Home Depot / Amazon"},
+  {id:103,cat:"Misc",name:"Flashlight",pri:"Week 1",lo:10,hi:25,where:"Target / Amazon"},
+  {id:104,cat:"Misc",name:"Extension cords",pri:"Day 1",lo:15,hi:30,where:"Target / Amazon"},
+  {id:105,cat:"Misc",name:"Power strips",pri:"Day 1",lo:20,hi:40,where:"Amazon / Target"},
+  {id:106,cat:"Misc",name:"Bug spray",pri:"Week 1",lo:8,hi:15,where:"Target / Grocery"},
+  {id:107,cat:"Misc",name:"Air purifier",pri:"Week 1",lo:80,hi:200,where:"Amazon / Target / Costco"},
+  {id:108,cat:"Misc",name:"Ring alarm",pri:"Anytime",lo:100,hi:200,where:"Amazon / Best Buy"},
+  {id:109,cat:"Misc",name:"Iron",pri:"Anytime",lo:30,hi:60,where:"Target / Amazon"},
+  {id:110,cat:"Misc",name:"Ironing board",pri:"Anytime",lo:25,hi:50,where:"Target / Amazon"},
+  {id:111,cat:"Cleaning",name:"Windex",pri:"Week 1",lo:4,hi:8,where:"Target / Grocery"},
+  {id:112,cat:"Cleaning",name:"Clorox wipes",pri:"Day 1",lo:8,hi:12,where:"Target / Grocery"},
+  {id:113,cat:"Cleaning",name:"Clorox spray",pri:"Week 1",lo:5,hi:8,where:"Target / Grocery"},
+  {id:114,cat:"Cleaning",name:"Fabuloso",pri:"Week 1",lo:6,hi:10,where:"Target / Grocery"},
+  {id:115,cat:"Cleaning",name:"Magic eraser",pri:"Week 1",lo:5,hi:8,where:"Target / Grocery"},
+  {id:116,cat:"Cleaning",name:"Laundry detergent",pri:"Day 1",lo:15,hi:25,where:"Target / Grocery / Costco"},
+  {id:117,cat:"Cleaning",name:"Dryer sheets",pri:"Day 1",lo:6,hi:12,where:"Target / Grocery"},
+  {id:118,cat:"Cleaning",name:"Dishwasher soap / pods",pri:"Week 1",lo:10,hi:18,where:"Target / Grocery"},
+  {id:119,cat:"Cleaning",name:"Sponges",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
+  {id:120,cat:"Cleaning",name:"Tissues",pri:"Week 1",lo:4,hi:8,where:"Target / Grocery"},
+  {id:121,cat:"Cleaning",name:"Trash bags",pri:"Day 1",lo:8,hi:15,where:"Target / Grocery / Costco"},
+  {id:122,cat:"Cleaning",name:"Toothpaste",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
+  {id:123,cat:"Cleaning",name:"Shampoo",pri:"Day 1",lo:8,hi:15,where:"Target / Grocery"},
+  {id:124,cat:"Cleaning",name:"Conditioner",pri:"Day 1",lo:8,hi:15,where:"Target / Grocery"},
+  {id:125,cat:"Cleaning",name:"Microfiber cloths",pri:"Week 1",lo:8,hi:15,where:"Target / Amazon"},
+  {id:126,cat:"Cleaning",name:"Draino",pri:"Week 1",lo:8,hi:12,where:"Target / Home Depot"},
+  {id:127,cat:"Cleaning",name:"Dish soap",pri:"Day 1",lo:4,hi:8,where:"Target / Grocery"},
+  {id:128,cat:"Cleaning",name:"Cleaning gloves",pri:"Week 1",lo:5,hi:10,where:"Target / Amazon"},
+  {id:129,cat:"Cleaning",name:"Paper towels",pri:"Day 1",lo:10,hi:18,where:"Target / Grocery / Costco"},
+  {id:130,cat:"Cleaning",name:"Tub & tile cleaner",pri:"Week 1",lo:5,hi:10,where:"Target / Grocery"}
+];
+
+var CATS = ["Bedroom","Living Room","Dining","Kitchen","Pantry","Bathroom","Misc","Cleaning"];
+var CAT_ICONS = {"Bedroom":"\uD83D\uDECF\uFE0F","Living Room":"\uD83D\uDECB\uFE0F","Dining":"\uD83C\uDF7D\uFE0F","Kitchen":"\uD83C\uDF73","Pantry":"\uD83E\uDED9","Bathroom":"\uD83D\uDEBF","Misc":"\uD83E\uDDF0","Cleaning":"\uD83E\uDDF9"};
+var PRIORITIES = ["Day 1","Week 1","Anytime"];
+var PRI_STYLE = {
+  "Day 1":{bg:"#FEE2E2",text:"#991B1B",border:"#FECACA"},
+  "Week 1":{bg:"#FEF3C7",text:"#92400E",border:"#FDE68A"},
+  "Anytime":{bg:"#DCFCE7",text:"#166534",border:"#BBF7D0"}
+};
+var KEY = "fremont-checklist-v1";
+
+/* ─────────── State ─────────── */
+var state = {
+  checked:{}, edits:{}, custom:[], collapsed:{},
+  editId:null, draftEdits:null, addingTo:null,
+  draft:{name:"",pri:"Week 1",where:"",lo:"",hi:""},
+  confirmId:null, catFilter:"All", priFilter:"All", showHiddenSec:false
+};
+
+/* ─────────── Storage (localStorage) ─────────── */
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){
+      var d = JSON.parse(raw);
+      state.checked = d.checked||{};
+      state.edits = d.edits||{};
+      state.custom = d.custom||[];
+    }
+  }catch(e){}
+}
+function persist(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify({checked:state.checked, edits:state.edits, custom:state.custom}));
+  }catch(e){}
+}
+
+/* ─────────── Helpers ─────────── */
+function allItems(){ return BASE.concat(state.custom); }
+function fieldOf(id,f){ return state.edits[id] ? state.edits[id][f] : undefined; }
+function val(item,f){ var v = fieldOf(item.id,f); return (v===undefined||v===null) ? item[f] : v; }
+function isHidden(item){ var v = fieldOf(item.id,"hidden"); return v===true; }
+function isCustom(item){ return String(item.id).indexOf("c_")===0; }
+function fmt(n){ n = Number(n)||0; return n>=1000 ? "$"+(n/1000).toFixed(1)+"k" : "$"+n; }
+function esc(s){
+  return String(s===undefined||s===null?"":s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function dispName(item){ var v=fieldOf(item.id,"name"); return (v===undefined||v===null)?item.name:v; }
+function dispPri(item){ var v=fieldOf(item.id,"pri"); return (v===undefined||v===null)?item.pri:v; }
+function dispWhere(item){ var v=fieldOf(item.id,"where"); return (v===undefined||v===null)?item.where:v; }
+function dispLo(item){ var v=fieldOf(item.id,"lo"); return (v===undefined||v===null)?item.lo:v; }
+function dispHi(item){ var v=fieldOf(item.id,"hi"); return (v===undefined||v===null)?item.hi:v; }
+function dispNote(item){ var v=fieldOf(item.id,"note"); return v?v:""; }
+function dispLink(item){ var v=fieldOf(item.id,"link"); return v?v:""; }
+
+/* ─────────── Render ─────────── */
+function render(){
+  var all = allItems();
+  var visible = all.filter(function(i){ return !isHidden(i); });
+  var doneCount = visible.filter(function(i){ return state.checked[i.id]; }).length;
+  var pct = visible.length ? Math.round(doneCount/visible.length*100) : 0;
+  var hiddenItems = all.filter(function(i){ return isHidden(i); });
+  var hiddenCt = hiddenItems.length;
+
+  var filtered = all.filter(function(i){
+    if(isHidden(i)) return false;
+    if(state.catFilter!=="All" && i.cat!==state.catFilter) return false;
+    if(state.priFilter!=="All" && dispPri(i)!==state.priFilter) return false;
+    return true;
+  });
+  var remaining = filtered.filter(function(i){ return !state.checked[i.id]; });
+  var budgetLo=0, budgetHi=0;
+  remaining.forEach(function(i){ budgetLo += Number(dispLo(i))||0; budgetHi += Number(dispHi(i))||0; });
+  var stillNeed = visible.filter(function(i){ return !state.checked[i.id]; }).length;
+
+  var h = "";
+
+  /* Header */
+  h += '<div class="header"><div class="wrap">';
+  h += '<p class="eyebrow">Fremont Move-In</p>';
+  h += '<h1 class="title">Apartment Checklist</h1>';
+  h += '<div class="progress-row"><span class="left">'+doneCount+' of '+visible.length+' items</span>';
+  h += '<span class="pct'+(pct===100?' done':'')+'">'+pct+'%</span></div>';
+  h += '<div class="bar"><div style="width:'+pct+'%"></div></div>';
+  h += '<div class="info">Saved automatically to this browser. Hit the same link on this device to pick up where you left off.</div>';
+  h += '<div class="cards">';
+  h += '<div class="stat"><div class="k">Remaining budget (shown)</div><div class="v">'+fmt(budgetLo)+' &ndash; '+fmt(budgetHi)+'</div></div>';
+  h += '<div class="stat"><div class="k">Still need to buy</div><div class="v green">'+stillNeed+' items</div></div>';
+  h += '</div></div></div>';
+
+  /* Filters */
+  h += '<div class="filters"><div class="wrap">';
+  h += '<div class="srow">';
+  ["All"].concat(CATS).forEach(function(c){
+    h += '<button class="cbtn'+(state.catFilter===c?' on':'')+'" data-act="catfilter" data-cat="'+esc(c)+'">'+(c!=="All"?CAT_ICONS[c]+" ":"")+esc(c)+'</button>';
+  });
+  h += '</div>';
+  h += '<div class="prow">';
+  ["All"].concat(PRIORITIES).forEach(function(p){
+    var on = state.priFilter===p;
+    var s = PRI_STYLE[p];
+    var style = on ? (s? 'background:'+s.bg+';border-color:'+s.border+';color:'+s.text+';' : 'background:#1C1917;border-color:#1C1917;color:#F5F0E8;') : '';
+    h += '<button class="pbtn" style="'+style+'" data-act="prifilter" data-pri="'+esc(p)+'">'+esc(p)+'</button>';
+  });
+  h += '</div>';
+  h += '</div></div>';
+
+  /* List */
+  h += '<div class="list">';
+  CATS.forEach(function(cat){
+    var items = filtered.filter(function(i){ return i.cat===cat; });
+    var isAdding = state.addingTo===cat;
+    if(items.length===0 && !isAdding) return;
+    var collapsed = !!state.collapsed[cat];
+    var catDone = items.filter(function(i){ return state.checked[i.id]; }).length;
+
+    h += '<div class="cat">';
+    h += '<div class="cathead" data-act="togglecat" data-cat="'+esc(cat)+'">';
+    h += '<span class="icon">'+CAT_ICONS[cat]+'</span>';
+    h += '<h2>'+esc(cat)+'</h2>';
+    h += '<span class="count">'+catDone+'/'+items.length+'</span>';
+    h += '<span class="chev'+(collapsed?' closed':'')+'">\u25BC</span>';
+    h += '</div>';
+
+    if(!collapsed){
+      h += '<div class="items">';
+      items.forEach(function(item){ h += itemCard(item); });
+      if(isAdding){ h += addForm(cat); }
+      else if(state.catFilter==="All" || state.catFilter===cat){
+        h += '<button class="addbtn" data-act="showadd" data-cat="'+esc(cat)+'"><span style="font-size:16px;line-height:1">+</span> Add item to '+esc(cat)+'</button>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+  });
+
+  /* Hidden section */
+  if(hiddenCt>0){
+    h += '<div class="cat hidsec">';
+    h += '<div class="cathead" data-act="togglehidden">';
+    h += '<span class="icon">\uD83D\uDE48</span>';
+    h += '<h2>Hidden items</h2>';
+    h += '<span class="count">'+hiddenCt+' item'+(hiddenCt!==1?'s':'')+'</span>';
+    h += '<span class="chev'+(state.showHiddenSec?'':' closed')+'">\u25BC</span>';
+    h += '</div>';
+    if(state.showHiddenSec){
+      h += '<div class="items">';
+      hiddenItems.forEach(function(item){
+        h += '<div class="card hiddenrow"><div style="display:flex;align-items:center;gap:12px;padding:11px 14px;">';
+        h += '<div style="flex:1;min-width:0;"><span style="font-size:14px;color:#78716C;">'+esc(dispName(item))+'</span>';
+        h += '<span style="font-size:11px;color:#A8A29E;margin-left:8px;">'+esc(item.cat)+'</span></div>';
+        h += '<button class="restorebtn" data-act="restore" data-id="'+esc(item.id)+'">\u21A9 Restore</button>';
+        h += '</div></div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  h += '<div style="height:32px"></div>';
+  h += '</div>';
+
+  var app = document.getElementById("app");
+  app.innerHTML = h;
+
+  // autofocus add-name field
+  if(state.addingTo){
+    var nf = app.querySelector('[data-field="add-name"]');
+    if(nf){ nf.focus(); nf.setSelectionRange(nf.value.length, nf.value.length); }
+  }
+}
+
+function itemCard(item){
+  var done = !!state.checked[item.id];
+  var open = state.editId===item.id;
+  var pri = dispPri(item);
+  var ps = PRI_STYLE[pri] || PRI_STYLE["Week 1"];
+  var lo = dispLo(item), hi = dispHi(item);
+  var where = dispWhere(item);
+  var note = dispNote(item);
+  var link = dispLink(item);
+  var pending = state.confirmId===item.id;
+  var custom = isCustom(item);
+
+  var c = '<div class="card'+(open?' editing':'')+(done?' done':'')+'">';
+
+  /* main row */
+  c += '<div class="irow" data-act="toggle" data-id="'+esc(item.id)+'">';
+  c += '<div class="box'+(done?' on':'')+'">'+(done?'<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>':'')+'</div>';
+  c += '<div style="flex:1;min-width:0;">';
+  c += '<div style="margin-bottom:5px;"><span class="iname">'+esc(dispName(item))+'</span></div>';
+  c += '<div class="meta">';
+  c += '<span class="pill" style="background:'+ps.bg+';color:'+ps.text+';border:1px solid '+ps.border+';">'+esc(pri)+'</span>';
+  if(Number(lo)||Number(hi)){ c += '<span class="cost">'+fmt(lo)+'&ndash;'+fmt(hi)+'</span>'; }
+  if(where && where!=="-"){ c += '<span class="where">\uD83D\uDED2 '+esc(where)+'</span>'; }
+  c += '</div>';
+  if(!open && note){ c += '<p class="note">"'+esc(note)+'"</p>'; }
+  if(!open && link){
+    var shortL = link.length>42 ? link.slice(0,42)+"\u2026" : link;
+    c += '<a class="linkchip" href="'+esc(link)+'" target="_blank" rel="noreferrer" data-stop="1">\uD83D\uDD17 '+esc(shortL)+'</a>';
+  }
+  c += '</div>';
+  c += '<button class="eico'+(open?' on':'')+'" data-act="'+(open?'canceledit':'openedit')+'" data-id="'+esc(item.id)+'">\u270E</button>';
+  c += '</div>';
+
+  /* edit panel */
+  if(open){
+    var d = state.draftEdits || {};
+    c += '<div class="panel" data-stop="1">';
+    c += '<label class="lbl">Name</label>';
+    c += '<input class="inp" data-field="name" value="'+esc(d.name)+'" placeholder="'+esc(item.name)+'">';
+
+    c += '<label class="lbl" style="margin-top:12px;">Priority</label>';
+    c += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    PRIORITIES.forEach(function(p){
+      var sel = (d.pri||item.pri)===p; var pp=PRI_STYLE[p];
+      var st = sel ? 'background:'+pp.bg+';border-color:'+pp.border+';color:'+pp.text+';' : '';
+      c += '<button class="ppill" style="'+st+'" data-act="setpri" data-id="'+esc(item.id)+'" data-pri="'+esc(p)+'">'+esc(p)+'</button>';
+    });
+    c += '</div>';
+
+    c += '<label class="lbl" style="margin-top:12px;">Where to buy</label>';
+    c += '<input class="inp" data-field="where" value="'+esc(d.where)+'" placeholder="e.g. Amazon, Target">';
+
+    c += '<div class="grid2" style="margin-top:12px;">';
+    c += '<div><label class="lbl" style="margin-bottom:4px;">Cost low ($)</label><input class="inp" type="number" data-field="lo" value="'+esc(d.lo)+'"></div>';
+    c += '<div><label class="lbl" style="margin-bottom:4px;">Cost high ($)</label><input class="inp" type="number" data-field="hi" value="'+esc(d.hi)+'"></div>';
+    c += '</div>';
+
+    c += '<label class="lbl" style="margin-top:12px;">Note</label>';
+    c += '<textarea class="inp" rows="2" data-field="note" placeholder="Any notes">'+esc(d.note)+'</textarea>';
+
+    c += '<label class="lbl" style="margin-top:12px;">Link</label>';
+    c += '<input class="inp" type="url" data-field="link" value="'+esc(d.link)+'" placeholder="https://">';
+
+    c += '<div class="panel-foot">';
+    c += '<div>';
+    if(pending){
+      c += '<span style="font-size:12px;color:#991B1B;margin-right:8px;">Are you sure?</span>';
+      c += '<button class="dbtn confirm" data-act="confirmdel" data-id="'+esc(item.id)+'">'+(custom?'Yes, delete':'Yes, hide')+'</button> ';
+      c += '<button class="xbtn" style="font-size:12px;" data-act="canceldel">No</button>';
+    } else {
+      c += '<button class="dbtn" data-act="askdel" data-id="'+esc(item.id)+'">'+(custom?'\uD83D\uDDD1 Delete':'\uD83D\uDE48 Hide')+'</button>';
+    }
+    c += '</div>';
+    c += '<div style="display:flex;gap:8px;">';
+    c += '<button class="xbtn" data-act="canceledit" data-id="'+esc(item.id)+'">Cancel</button>';
+    c += '<button class="sbtn" data-act="saveedit" data-id="'+esc(item.id)+'">Save</button>';
+    c += '</div>';
+    c += '</div>';
+    c += '</div>';
+  }
+
+  c += '</div>';
+  return c;
+}
+
+function addForm(cat){
+  var d = state.draft;
+  var c = '<div class="addform" data-stop="1">';
+  c += '<label class="lbl" style="margin-bottom:6px;">New item &mdash; '+esc(cat)+'</label>';
+  c += '<input class="inp" data-field="add-name" value="'+esc(d.name)+'" placeholder="Item name">';
+  c += '<label class="lbl" style="margin-top:10px;margin-bottom:6px;">Priority</label>';
+  c += '<div style="display:flex;gap:6px;">';
+  PRIORITIES.forEach(function(p){
+    var sel = d.pri===p; var pp=PRI_STYLE[p];
+    var st = sel ? 'background:'+pp.bg+';border-color:'+pp.border+';color:'+pp.text+';' : '';
+    c += '<button class="ppill" style="'+st+'" data-act="addsetpri" data-pri="'+esc(p)+'">'+esc(p)+'</button>';
+  });
+  c += '</div>';
+  c += '<label class="lbl" style="margin-top:10px;margin-bottom:4px;">Where to buy</label>';
+  c += '<input class="inp" data-field="add-where" value="'+esc(d.where)+'" placeholder="e.g. Amazon / Target">';
+  c += '<div class="grid2" style="margin-top:10px;">';
+  c += '<div><label class="lbl" style="margin-bottom:4px;">Cost low ($)</label><input class="inp" type="number" data-field="add-lo" value="'+esc(d.lo)+'"></div>';
+  c += '<div><label class="lbl" style="margin-bottom:4px;">Cost high ($)</label><input class="inp" type="number" data-field="add-hi" value="'+esc(d.hi)+'"></div>';
+  c += '</div>';
+  c += '<div style="display:flex;gap:8px;margin-top:14px;">';
+  c += '<button class="sbtn"'+(d.name.trim()?'':' disabled')+' data-act="submitadd" data-cat="'+esc(cat)+'">Add</button>';
+  c += '<button class="xbtn" data-act="canceladd">Cancel</button>';
+  c += '</div>';
+  c += '</div>';
+  return c;
+}
+
+/* ─────────── Actions ─────────── */
+function initDraft(item){
+  return {
+    name: dispName(item), pri: dispPri(item), where: dispWhere(item),
+    lo: dispLo(item), hi: dispHi(item), note: dispNote(item), link: dispLink(item)
+  };
+}
+
+function handleClick(e){
+  var stop = e.target.closest('[data-stop]');
+  var el = e.target.closest('[data-act]');
+  // allow links to work
+  if(e.target.closest('a.linkchip')) return;
+  if(!el) return;
+  var act = el.getAttribute('data-act');
+  var id = el.getAttribute('data-id');
+  var cat = el.getAttribute('data-cat');
+  var pri = el.getAttribute('data-pri');
+
+  // numeric-ish ids: keep as original type by matching against items
+  function findItem(rawId){
+    var all = allItems();
+    for(var i=0;i<all.length;i++){ if(String(all[i].id)===String(rawId)) return all[i]; }
+    return null;
+  }
+
+  switch(act){
+    case "toggle":
+      state.checked[idKey(id)] = !state.checked[idKey(id)];
+      persist(); render(); break;
+    case "togglecat":
+      state.collapsed[cat] = !state.collapsed[cat]; render(); break;
+    case "togglehidden":
+      state.showHiddenSec = !state.showHiddenSec; render(); break;
+    case "catfilter":
+      state.catFilter = cat; render(); break;
+    case "prifilter":
+      state.priFilter = pri; render(); break;
+    case "openedit":
+      var it = findItem(id);
+      state.editId = it ? it.id : null;
+      state.draftEdits = it ? initDraft(it) : null;
+      state.confirmId = null; render(); break;
+    case "canceledit":
+      state.editId = null; state.draftEdits = null; state.confirmId = null; render(); break;
+    case "saveedit":
+      commitEdit(id); break;
+    case "setpri":
+      if(state.draftEdits) state.draftEdits.pri = pri; render(); break;
+    case "askdel":
+      state.confirmId = findItem(id) ? findItem(id).id : null; render(); break;
+    case "canceldel":
+      state.confirmId = null; render(); break;
+    case "confirmdel":
+      doDelete(id); break;
+    case "restore":
+      setHidden(id,false); render(); break;
+    case "showadd":
+      state.addingTo = cat; state.draft = {name:"",pri:"Week 1",where:"",lo:"",hi:""}; render(); break;
+    case "canceladd":
+      state.addingTo = null; render(); break;
+    case "addsetpri":
+      state.draft.pri = pri; render(); break;
+    case "submitadd":
+      submitAdd(cat); break;
+  }
+}
+
+function idKey(rawId){
+  // match stored key to the item's actual id type
+  var all = allItems();
+  for(var i=0;i<all.length;i++){ if(String(all[i].id)===String(rawId)) return all[i].id; }
+  return rawId;
+}
+
+function ensureEdits(id){ if(!state.edits[id]) state.edits[id] = {}; return state.edits[id]; }
+
+function commitEdit(rawId){
+  var id = idKey(rawId);
+  var d = state.draftEdits || {};
+  var e = ensureEdits(id);
+  e.name = d.name; e.pri = d.pri; e.where = d.where;
+  e.lo = Number(d.lo)||0; e.hi = Number(d.hi)||0;
+  e.note = d.note; e.link = d.link;
+  state.editId = null; state.draftEdits = null; state.confirmId = null;
+  persist(); render();
+}
+
+function setHidden(rawId, val){
+  var id = idKey(rawId);
+  ensureEdits(id).hidden = val;
+  persist();
+}
+
+function doDelete(rawId){
+  var id = idKey(rawId);
+  if(String(id).indexOf("c_")===0){
+    state.custom = state.custom.filter(function(i){ return i.id!==id; });
+  } else {
+    ensureEdits(id).hidden = true;
+  }
+  state.editId = null; state.draftEdits = null; state.confirmId = null;
+  persist(); render();
+}
+
+function submitAdd(cat){
+  var d = state.draft;
+  if(!d.name.trim()) return;
+  state.custom.push({
+    id:"c_"+Date.now(), cat:cat, name:d.name.trim(), pri:d.pri,
+    where:(d.where.trim()||"-"), lo:Number(d.lo)||0, hi:Number(d.hi)||0
+  });
+  state.draft = {name:"",pri:"Week 1",where:"",lo:"",hi:""};
+  state.addingTo = null;
+  persist(); render();
+}
+
+/* inputs update drafts WITHOUT re-render (preserves focus while typing) */
+function handleInput(e){
+  var el = e.target;
+  var f = el.getAttribute('data-field');
+  if(!f) return;
+  if(f.indexOf("add-")===0){
+    var key = f.slice(4);
+    state.draft[key] = el.value;
+    // toggle Add button enabled state live
+    if(key==="name"){
+      var btn = document.querySelector('[data-act="submitadd"]');
+      if(btn){ if(el.value.trim()) btn.removeAttribute('disabled'); else btn.setAttribute('disabled','disabled'); }
+    }
+  } else {
+    if(!state.draftEdits) state.draftEdits = {};
+    state.draftEdits[f] = el.value;
+  }
+}
+
+function handleKeydown(e){
+  var f = e.target.getAttribute && e.target.getAttribute('data-field');
+  if(f==="add-name"){
+    if(e.key==="Enter"){ var cat=state.addingTo; if(cat) submitAdd(cat); }
+    else if(e.key==="Escape"){ state.addingTo=null; render(); }
+  }
+}
+
+/* ─────────── Init ─────────── */
+load();
+render();
+var app = document.getElementById("app");
+app.addEventListener("click", handleClick);
+app.addEventListener("input", handleInput);
+app.addEventListener("keydown", handleKeydown);
+</script>
+</body>
+</html>
