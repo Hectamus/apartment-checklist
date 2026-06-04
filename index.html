@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fremont Move-In Checklist</title>
+<title>Apartment Checklist</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   :root{
@@ -54,6 +54,13 @@
   .cathead .count{font-size:12px;color:#A8A29E;}
   .chev{font-size:11px;color:#A8A29E;transition:transform .2s;margin-left:auto;}
   .chev.closed{transform:rotate(-90deg);}
+  .catdel{cursor:pointer;border:none;background:none;color:#C4C0B8;font-size:13px;padding:2px 6px;border-radius:6px;transition:all .15s;}
+  .catdel:hover{color:#991B1B;background:#FEE2E2;}
+  .catedit{cursor:pointer;border:none;background:none;color:#C4C0B8;font-size:13px;padding:2px 6px;border-radius:6px;margin-left:auto;transition:all .15s;}
+  .catedit:hover{color:var(--accent);background:#FFF0EB;}
+  .catedit + .catdel{margin-left:0;}
+  .catedit + .chev, .catdel + .chev{margin-left:8px;}
+  .assignee{font-size:11px;background:#F3F0FF;color:#6D28D9;border-radius:8px;padding:2px 8px;font-weight:500;}
 
   .items{display:flex;flex-direction:column;gap:6px;}
   .card{background:#fff;border-radius:12px;border:1.5px solid #F0EBE1;overflow:hidden;transition:border-color .1s;}
@@ -272,13 +279,30 @@ var PRI_STYLE = {
 };
 var KEY = "fremont-checklist-v1";
 
+// All categories = built-in + any custom ones the user added
+function allCats(){ return CATS.concat(state.customCats || []); }
+function catIcon(c){ return CAT_ICONS[c] || "\uD83D\uDCE6"; } // default: box emoji
+function catDisplay(c){ return (state.catNames && state.catNames[c]) ? state.catNames[c] : c; }
+
+// view preferences (per-device, not synced)
+var PREF_KEY = "fremont-checklist-prefs";
+function loadPrefs(){
+  try{ var p = JSON.parse(localStorage.getItem(PREF_KEY)||"{}"); if(p.sortMode) state.sortMode = p.sortMode; }catch(e){}
+}
+function savePrefs(){
+  try{ localStorage.setItem(PREF_KEY, JSON.stringify({sortMode:state.sortMode})); }catch(e){}
+}
+
 /* ─────────── State ─────────── */
 var state = {
-  checked:{}, edits:{}, custom:[], collapsed:{},
+  checked:{}, edits:{}, custom:[], customCats:[], catNames:{}, collapsed:{},
   editId:null, draftEdits:null, addingTo:null,
   draft:{name:"",pri:"Week 1",where:"",lo:"",hi:""},
   confirmId:null, catFilter:"All", priFilter:"All", showHiddenSec:false,
-  syncStatus:"connecting"
+  syncStatus:"connecting",
+  addingCat:false, newCatName:"",
+  renamingCat:null, catRenameDraft:"",
+  sortMode:"default", confirmClear:false
 };
 
 /* ─────────── Storage (localStorage cache) ─────────── */
@@ -290,12 +314,14 @@ function load(){
       state.checked = d.checked||{};
       state.edits = d.edits||{};
       state.custom = d.custom||[];
+      state.customCats = d.customCats||[];
+      state.catNames = d.catNames||{};
     }
   }catch(e){}
 }
 function saveLocal(){
   try{
-    localStorage.setItem(KEY, JSON.stringify({checked:state.checked, edits:state.edits, custom:state.custom}));
+    localStorage.setItem(KEY, JSON.stringify({checked:state.checked, edits:state.edits, custom:state.custom, customCats:state.customCats, catNames:state.catNames}));
   }catch(e){}
 }
 
@@ -331,16 +357,18 @@ function initFirebase(){
       var v = snap.val();
       if(v===null){
         // nothing in the cloud yet — seed it from whatever is local
-        if(Object.keys(state.checked).length || Object.keys(state.edits).length || state.custom.length){
+        if(Object.keys(state.checked).length || Object.keys(state.edits).length || state.custom.length || state.customCats.length || Object.keys(state.catNames).length){
           pushToFirebase();
         }
         return;
       }
-      var incoming = JSON.stringify({checked:v.checked||{}, edits:v.edits||{}, custom:v.custom||[]});
+      var incoming = JSON.stringify({checked:v.checked||{}, edits:v.edits||{}, custom:v.custom||[], customCats:v.customCats||[], catNames:v.catNames||{}});
       if(incoming === lastPushed) return; // ignore the echo of our own write
       state.checked = v.checked||{};
       state.edits   = v.edits||{};
       state.custom  = v.custom||[];
+      state.customCats = v.customCats||[];
+      state.catNames = v.catNames||{};
       try{ localStorage.setItem(KEY, incoming); }catch(e){}
       // don't yank the UI out from under someone mid-edit
       if(state.editId===null && state.addingTo===null){ render(); }
@@ -352,7 +380,7 @@ function initFirebase(){
 
 function pushToFirebase(){
   if(!dbRef) return;
-  var payload = {checked:state.checked, edits:state.edits, custom:state.custom};
+  var payload = {checked:state.checked, edits:state.edits, custom:state.custom, customCats:state.customCats, catNames:state.catNames};
   lastPushed = JSON.stringify(payload);
   try{ dbRef.set(payload); }catch(e){}
 }
@@ -390,8 +418,40 @@ function dispPri(item){ var v=fieldOf(item.id,"pri"); return (v===undefined||v==
 function dispWhere(item){ var v=fieldOf(item.id,"where"); return (v===undefined||v===null)?item.where:v; }
 function dispLo(item){ var v=fieldOf(item.id,"lo"); return (v===undefined||v===null)?item.lo:v; }
 function dispHi(item){ var v=fieldOf(item.id,"hi"); return (v===undefined||v===null)?item.hi:v; }
+// Single cost. Prefers an explicit cost (edit override or custom item),
+// otherwise collapses any old low/high range to one representative number.
+function dispCost(item){
+  var ec = fieldOf(item.id,"cost");
+  if(ec!==undefined && ec!==null && ec!=="") return Number(ec)||0;
+  if(item.cost!==undefined && item.cost!==null) return Number(item.cost)||0;
+  var elo = fieldOf(item.id,"lo"), ehi = fieldOf(item.id,"hi");
+  var lo = (elo!==undefined&&elo!==null)?Number(elo):(Number(item.lo)||0);
+  var hi = (ehi!==undefined&&ehi!==null)?Number(ehi):(Number(item.hi)||0);
+  if(lo&&hi) return Math.round((lo+hi)/2);
+  return hi||lo||0;
+}
 function dispNote(item){ var v=fieldOf(item.id,"note"); return v?v:""; }
 function dispLink(item){ var v=fieldOf(item.id,"link"); return v?v:""; }
+function dispAssignee(item){ var v=fieldOf(item.id,"assignee"); return v?v:""; }
+
+var PRI_ORDER = {"Day 1":0,"Week 1":1,"Anytime":2};
+function sortItems(items){
+  if(state.sortMode==="default") return items;
+  var arr = items.slice();
+  if(state.sortMode==="priority"){
+    arr.sort(function(a,b){
+      var pa = PRI_ORDER[dispPri(a)]; if(pa===undefined) pa=3;
+      var pb = PRI_ORDER[dispPri(b)]; if(pb===undefined) pb=3;
+      return pa-pb;
+    });
+  } else if(state.sortMode==="unchecked"){
+    arr.sort(function(a,b){
+      var ca = state.checked[a.id]?1:0, cb = state.checked[b.id]?1:0;
+      return ca-cb;
+    });
+  }
+  return arr;
+}
 
 /* ─────────── Render ─────────── */
 function render(){
@@ -409,9 +469,15 @@ function render(){
     return true;
   });
   var remaining = filtered.filter(function(i){ return !state.checked[i.id]; });
-  var budgetLo=0, budgetHi=0;
-  remaining.forEach(function(i){ budgetLo += Number(dispLo(i))||0; budgetHi += Number(dispHi(i))||0; });
   var stillNeed = visible.filter(function(i){ return !state.checked[i.id]; }).length;
+
+  // budgets over ALL visible items (stable regardless of filter)
+  var spent=0, left=0;
+  visible.forEach(function(i){
+    var cost = Number(dispCost(i))||0;
+    if(state.checked[i.id]){ spent+=cost; } else { left+=cost; }
+  });
+  var total = spent+left;
 
   var h = "";
 
@@ -424,15 +490,17 @@ function render(){
   h += '<div class="bar"><div style="width:'+pct+'%"></div></div>';
   h += '<div class="info" id="syncbadge">'+syncBadgeHTML()+'</div>';
   h += '<div class="cards">';
-  h += '<div class="stat"><div class="k">Remaining budget (shown)</div><div class="v">'+fmt(budgetLo)+' &ndash; '+fmt(budgetHi)+'</div></div>';
-  h += '<div class="stat"><div class="k">Still need to buy</div><div class="v green">'+stillNeed+' items</div></div>';
-  h += '</div></div></div>';
+  h += '<div class="stat"><div class="k">Bought (est.)</div><div class="v green">'+fmt(spent)+'</div></div>';
+  h += '<div class="stat"><div class="k">Left to buy (est.) &middot; '+stillNeed+' items</div><div class="v">'+fmt(left)+'</div></div>';
+  h += '</div>';
+  h += '<p style="margin-top:10px;font-size:12px;color:#A8A29E;">Full apartment estimate: <span style="color:#F5F0E8;font-weight:600;">'+fmt(totalLo)+' &ndash; '+fmt(totalHi)+'</span></p>';
+  h += '</div></div>';
 
   /* Filters */
   h += '<div class="filters"><div class="wrap">';
   h += '<div class="srow">';
-  ["All"].concat(CATS).forEach(function(c){
-    h += '<button class="cbtn'+(state.catFilter===c?' on':'')+'" data-act="catfilter" data-cat="'+esc(c)+'">'+(c!=="All"?CAT_ICONS[c]+" ":"")+esc(c)+'</button>';
+  ["All"].concat(allCats()).forEach(function(c){
+    h += '<button class="cbtn'+(state.catFilter===c?' on':'')+'" data-act="catfilter" data-cat="'+esc(c)+'">'+(c!=="All"?catIcon(c)+" ":"")+esc(c)+'</button>';
   });
   h += '</div>';
   h += '<div class="prow">';
@@ -443,36 +511,77 @@ function render(){
     h += '<button class="pbtn" style="'+style+'" data-act="prifilter" data-pri="'+esc(p)+'">'+esc(p)+'</button>';
   });
   h += '</div>';
+  h += '<div class="prow" style="margin-top:6px;align-items:center;">';
+  h += '<span style="font-size:11px;color:#78716C;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-right:2px;">Sort</span>';
+  [["default","Default"],["priority","Priority"],["unchecked","To-do first"]].forEach(function(o){
+    var on = state.sortMode===o[0];
+    var style = on ? 'background:#1C1917;border-color:#1C1917;color:#F5F0E8;' : '';
+    h += '<button class="pbtn" style="'+style+'" data-act="setsort" data-sort="'+o[0]+'">'+o[1]+'</button>';
+  });
+  h += '</div>';
   h += '</div></div>';
 
   /* List */
   h += '<div class="list">';
-  CATS.forEach(function(cat){
+  allCats().forEach(function(cat){
     var items = filtered.filter(function(i){ return i.cat===cat; });
     var isAdding = state.addingTo===cat;
-    if(items.length===0 && !isAdding) return;
+    var isCustomCat = (state.customCats||[]).indexOf(cat) > -1;
+    if(items.length===0 && !isAdding && !isCustomCat) return;
     var collapsed = !!state.collapsed[cat];
     var catDone = items.filter(function(i){ return state.checked[i.id]; }).length;
+    var renaming = state.renamingCat===cat;
+
+    items = sortItems(items);
 
     h += '<div class="cat">';
-    h += '<div class="cathead" data-act="togglecat" data-cat="'+esc(cat)+'">';
-    h += '<span class="icon">'+CAT_ICONS[cat]+'</span>';
-    h += '<h2>'+esc(cat)+'</h2>';
-    h += '<span class="count">'+catDone+'/'+items.length+'</span>';
-    h += '<span class="chev'+(collapsed?' closed':'')+'">\u25BC</span>';
-    h += '</div>';
+    if(renaming){
+      h += '<div class="addform" data-stop="1" style="margin-bottom:10px;">';
+      h += '<label class="lbl" style="margin-bottom:6px;">Rename category</label>';
+      h += '<input class="inp" data-field="catrename" value="'+esc(state.catRenameDraft)+'" placeholder="'+esc(catDisplay(cat))+'">';
+      h += '<div style="display:flex;gap:8px;margin-top:14px;">';
+      h += '<button class="sbtn"'+(state.catRenameDraft.trim()?'':' disabled')+' data-act="saverenamecat" data-cat="'+esc(cat)+'">Save</button>';
+      h += '<button class="xbtn" data-act="cancelrenamecat">Cancel</button>';
+      h += '</div></div>';
+    } else {
+      h += '<div class="cathead" data-act="togglecat" data-cat="'+esc(cat)+'">';
+      h += '<span class="icon">'+catIcon(cat)+'</span>';
+      h += '<h2>'+esc(catDisplay(cat))+'</h2>';
+      h += '<span class="count">'+catDone+'/'+items.length+'</span>';
+      h += '<button class="catedit" data-act="renamecat" data-cat="'+esc(cat)+'" title="Rename category">\u270E</button>';
+      if(isCustomCat){
+        h += '<button class="catdel" data-act="delcat" data-cat="'+esc(cat)+'" title="Remove category">\u2715</button>';
+      }
+      h += '<span class="chev'+(collapsed?' closed':'')+'">\u25BC</span>';
+      h += '</div>';
+    }
 
-    if(!collapsed){
+    if(!collapsed && !renaming){
       h += '<div class="items">';
       items.forEach(function(item){ h += itemCard(item); });
       if(isAdding){ h += addForm(cat); }
       else if(state.catFilter==="All" || state.catFilter===cat){
-        h += '<button class="addbtn" data-act="showadd" data-cat="'+esc(cat)+'"><span style="font-size:16px;line-height:1">+</span> Add item to '+esc(cat)+'</button>';
+        h += '<button class="addbtn" data-act="showadd" data-cat="'+esc(cat)+'"><span style="font-size:16px;line-height:1">+</span> Add item to '+esc(catDisplay(cat))+'</button>';
       }
       h += '</div>';
     }
     h += '</div>';
   });
+
+  /* Add category */
+  if(state.catFilter==="All"){
+    if(state.addingCat){
+      h += '<div class="addform" data-stop="1" style="margin-bottom:24px;">';
+      h += '<label class="lbl" style="margin-bottom:6px;">New category</label>';
+      h += '<input class="inp" data-field="newcat" value="'+esc(state.newCatName)+'" placeholder="e.g. Garage, Office, Patio">';
+      h += '<div style="display:flex;gap:8px;margin-top:14px;">';
+      h += '<button class="sbtn"'+(state.newCatName.trim()?'':' disabled')+' data-act="submitaddcat">Add category</button>';
+      h += '<button class="xbtn" data-act="canceladdcat">Cancel</button>';
+      h += '</div></div>';
+    } else {
+      h += '<button class="addbtn" data-act="showaddcat" style="margin-bottom:24px;"><span style="font-size:16px;line-height:1">+</span> Add a category</button>';
+    }
+  }
 
   /* Hidden section */
   if(hiddenCt>0){
@@ -497,6 +606,17 @@ function render(){
     h += '</div>';
   }
 
+  /* Reset */
+  h += '<div style="margin-top:8px;text-align:center;">';
+  if(state.confirmClear){
+    h += '<span style="font-size:13px;color:#991B1B;margin-right:8px;">Uncheck everything?</span>';
+    h += '<button class="dbtn confirm" data-act="confirmclear">Yes, clear all</button> ';
+    h += '<button class="xbtn" style="font-size:12px;" data-act="cancelclear">Cancel</button>';
+  } else {
+    h += '<button class="xbtn" style="font-size:12px;color:#A8A29E;" data-act="askclear">Clear all checkmarks</button>';
+  }
+  h += '</div>';
+
   h += '<div style="height:32px"></div>';
   h += '</div>';
 
@@ -507,6 +627,14 @@ function render(){
   if(state.addingTo){
     var nf = app.querySelector('[data-field="add-name"]');
     if(nf){ nf.focus(); nf.setSelectionRange(nf.value.length, nf.value.length); }
+  }
+  if(state.addingCat){
+    var cf = app.querySelector('[data-field="newcat"]');
+    if(cf){ cf.focus(); cf.setSelectionRange(cf.value.length, cf.value.length); }
+  }
+  if(state.renamingCat){
+    var rf = app.querySelector('[data-field="catrename"]');
+    if(rf){ rf.focus(); rf.setSelectionRange(rf.value.length, rf.value.length); }
   }
 }
 
@@ -533,6 +661,8 @@ function itemCard(item){
   c += '<span class="pill" style="background:'+ps.bg+';color:'+ps.text+';border:1px solid '+ps.border+';">'+esc(pri)+'</span>';
   if(Number(lo)||Number(hi)){ c += '<span class="cost">'+fmt(lo)+'&ndash;'+fmt(hi)+'</span>'; }
   if(where && where!=="-"){ c += '<span class="where">\uD83D\uDED2 '+esc(where)+'</span>'; }
+  var who = dispAssignee(item);
+  if(who){ c += '<span class="assignee">\uD83D\uDC64 '+esc(who)+'</span>'; }
   c += '</div>';
   if(!open && note){ c += '<p class="note">"'+esc(note)+'"</p>'; }
   if(!open && link){
@@ -572,6 +702,9 @@ function itemCard(item){
 
     c += '<label class="lbl" style="margin-top:12px;">Link</label>';
     c += '<input class="inp" type="url" data-field="link" value="'+esc(d.link)+'" placeholder="https://">';
+
+    c += '<label class="lbl" style="margin-top:12px;">Assigned to</label>';
+    c += '<input class="inp" data-field="assignee" value="'+esc(d.assignee)+'" placeholder="e.g. Me, or a name">';
 
     c += '<div class="panel-foot">';
     c += '<div>';
@@ -626,7 +759,8 @@ function addForm(cat){
 function initDraft(item){
   return {
     name: dispName(item), pri: dispPri(item), where: dispWhere(item),
-    lo: dispLo(item), hi: dispHi(item), note: dispNote(item), link: dispLink(item)
+    lo: dispLo(item), hi: dispHi(item), note: dispNote(item), link: dispLink(item),
+    assignee: dispAssignee(item)
   };
 }
 
@@ -687,6 +821,28 @@ function handleClick(e){
       state.draft.pri = pri; render(); break;
     case "submitadd":
       submitAdd(cat); break;
+    case "showaddcat":
+      state.addingCat = true; state.newCatName = ""; render(); break;
+    case "canceladdcat":
+      state.addingCat = false; state.newCatName = ""; render(); break;
+    case "submitaddcat":
+      submitAddCat(); break;
+    case "delcat":
+      deleteCat(cat); break;
+    case "setsort":
+      state.sortMode = el.getAttribute('data-sort'); savePrefs(); render(); break;
+    case "renamecat":
+      state.renamingCat = cat; state.catRenameDraft = catDisplay(cat); render(); break;
+    case "saverenamecat":
+      saveRenameCat(cat); break;
+    case "cancelrenamecat":
+      state.renamingCat = null; state.catRenameDraft = ""; render(); break;
+    case "askclear":
+      state.confirmClear = true; render(); break;
+    case "cancelclear":
+      state.confirmClear = false; render(); break;
+    case "confirmclear":
+      state.checked = {}; state.confirmClear = false; persist(); render(); break;
   }
 }
 
@@ -705,7 +861,7 @@ function commitEdit(rawId){
   var e = ensureEdits(id);
   e.name = d.name; e.pri = d.pri; e.where = d.where;
   e.lo = Number(d.lo)||0; e.hi = Number(d.hi)||0;
-  e.note = d.note; e.link = d.link;
+  e.note = d.note; e.link = d.link; e.assignee = d.assignee;
   state.editId = null; state.draftEdits = null; state.confirmId = null;
   persist(); render();
 }
@@ -739,12 +895,49 @@ function submitAdd(cat){
   persist(); render();
 }
 
+function submitAddCat(){
+  var name = (state.newCatName||"").trim();
+  if(!name) return;
+  // avoid duplicates (built-in or already-added)
+  if(allCats().indexOf(name) === -1){
+    state.customCats.push(name);
+  }
+  state.addingCat = false; state.newCatName = "";
+  persist(); render();
+}
+
+function deleteCat(cat){
+  // remove the category and any custom items inside it
+  state.customCats = (state.customCats||[]).filter(function(c){ return c!==cat; });
+  state.custom = state.custom.filter(function(i){ return i.cat!==cat; });
+  if(state.catNames) delete state.catNames[cat];
+  persist(); render();
+}
+
+function saveRenameCat(cat){
+  var name = (state.catRenameDraft||"").trim();
+  if(name){
+    if(name===cat){ if(state.catNames) delete state.catNames[cat]; } // reset to original
+    else { state.catNames[cat] = name; }
+  }
+  state.renamingCat = null; state.catRenameDraft = "";
+  persist(); render();
+}
+
 /* inputs update drafts WITHOUT re-render (preserves focus while typing) */
 function handleInput(e){
   var el = e.target;
   var f = el.getAttribute('data-field');
   if(!f) return;
-  if(f.indexOf("add-")===0){
+  if(f==="newcat"){
+    state.newCatName = el.value;
+    var cbtn = document.querySelector('[data-act="submitaddcat"]');
+    if(cbtn){ if(el.value.trim()) cbtn.removeAttribute('disabled'); else cbtn.setAttribute('disabled','disabled'); }
+  } else if(f==="catrename"){
+    state.catRenameDraft = el.value;
+    var rbtn = document.querySelector('[data-act="saverenamecat"]');
+    if(rbtn){ if(el.value.trim()) rbtn.removeAttribute('disabled'); else rbtn.setAttribute('disabled','disabled'); }
+  } else if(f.indexOf("add-")===0){
     var key = f.slice(4);
     state.draft[key] = el.value;
     // toggle Add button enabled state live
@@ -763,10 +956,17 @@ function handleKeydown(e){
   if(f==="add-name"){
     if(e.key==="Enter"){ var cat=state.addingTo; if(cat) submitAdd(cat); }
     else if(e.key==="Escape"){ state.addingTo=null; render(); }
+  } else if(f==="newcat"){
+    if(e.key==="Enter"){ submitAddCat(); }
+    else if(e.key==="Escape"){ state.addingCat=false; state.newCatName=""; render(); }
+  } else if(f==="catrename"){
+    if(e.key==="Enter"){ saveRenameCat(state.renamingCat); }
+    else if(e.key==="Escape"){ state.renamingCat=null; state.catRenameDraft=""; render(); }
   }
 }
 
 /* ─────────── Init ─────────── */
+loadPrefs();       // per-device view preferences (sort)
 load();            // instant UI from local cache
 render();
 initFirebase();    // connect to shared sync; re-renders when cloud data arrives
