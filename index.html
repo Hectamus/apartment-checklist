@@ -287,15 +287,6 @@ BASE.forEach(function(i){ totalCost += Number(i.cost)||0; });
 function allCats(){ return CATS.concat(state.customCats || []); }
 function catDisplay(c){ return (state.catNames && state.catNames[c]) ? state.catNames[c] : DEFAULT_CAT_DISPLAY[c] || c; }
 
-// view preferences (per-device, not synced)
-var PREF_KEY = "fremont-checklist-prefs";
-function loadPrefs(){
-  try{ var p = JSON.parse(localStorage.getItem(PREF_KEY)||"{}"); if(p.sortMode) state.sortMode = p.sortMode; }catch(e){}
-}
-function savePrefs(){
-  try{ localStorage.setItem(PREF_KEY, JSON.stringify({sortMode:state.sortMode})); }catch(e){}
-}
-
 /* ─────────── State ─────────── */
 var state = {
   checked:{}, edits:{}, custom:[], customCats:[], catNames:{}, collapsed:{},
@@ -305,7 +296,7 @@ var state = {
   syncStatus:"connecting", lastEdited:null,
   addingCat:false, newCatName:"",
   renamingCat:null, catRenameDraft:"",
-  sortMode:"default", confirmClear:false
+  confirmClear:false
 };
 
 /* ─────────── Storage (localStorage cache) ─────────── */
@@ -451,25 +442,6 @@ function dispNote(item){ var v=fieldOf(item.id,"note"); return v?v:""; }
 function dispLink(item){ var v=fieldOf(item.id,"link"); return v?v:""; }
 function dispAssignee(item){ var v=fieldOf(item.id,"assignee"); return v?v:""; }
 
-var PRI_ORDER = {"Day 1":0,"Week 1":1,"Anytime":2};
-function sortItems(items){
-  if(state.sortMode==="default") return items;
-  var arr = items.slice();
-  if(state.sortMode==="priority"){
-    arr.sort(function(a,b){
-      var pa = PRI_ORDER[dispPri(a)]; if(pa===undefined) pa=3;
-      var pb = PRI_ORDER[dispPri(b)]; if(pb===undefined) pb=3;
-      return pa-pb;
-    });
-  } else if(state.sortMode==="unchecked"){
-    arr.sort(function(a,b){
-      var ca = state.checked[a.id]?1:0, cb = state.checked[b.id]?1:0;
-      return ca-cb;
-    });
-  }
-  return arr;
-}
-
 /* ─────────── Render ─────────── */
 function render(){
   var all = allItems();
@@ -525,14 +497,6 @@ function render(){
     h += '<button class="pbtn" style="'+style+'" data-act="prifilter" data-pri="'+esc(p)+'">'+esc(p)+'</button>';
   });
   h += '</div>';
-  h += '<div class="prow" style="margin-top:6px;align-items:center;">';
-  h += '<span style="font-size:11px;color:#78716C;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-right:2px;">Sort</span>';
-  [["default","Default"],["priority","Priority"],["unchecked","To-do first"]].forEach(function(o){
-    var on = state.sortMode===o[0];
-    var style = on ? 'background:#1C1917;border-color:#1C1917;color:#F5F0E8;' : '';
-    h += '<button class="pbtn" style="'+style+'" data-act="setsort" data-sort="'+o[0]+'">'+o[1]+'</button>';
-  });
-  h += '</div>';
   h += '</div></div>';
 
   /* List */
@@ -545,8 +509,6 @@ function render(){
     var collapsed = !!state.collapsed[cat];
     var catDone = items.filter(function(i){ return state.checked[i.id]; }).length;
     var renaming = state.renamingCat===cat;
-
-    items = sortItems(items);
 
     h += '<div class="cat">';
     if(renaming){
@@ -841,8 +803,6 @@ function handleClick(e){
       submitAddCat(); break;
     case "delcat":
       deleteCat(cat); break;
-    case "setsort":
-      state.sortMode = el.getAttribute('data-sort'); savePrefs(); render(); break;
     case "renamecat":
       state.renamingCat = cat; state.catRenameDraft = catDisplay(cat); render(); break;
     case "saverenamecat":
@@ -979,7 +939,6 @@ function handleKeydown(e){
 
 /* ─────────── Init (wait for DOM) ─────────── */
 function initApp(){
-  loadPrefs();       // per-device view preferences (sort)
   load();            // instant UI from local cache
   render();          // render immediately before Firebase even loads
   initFirebase();    // connect to shared sync; re-renders when cloud data arrives
